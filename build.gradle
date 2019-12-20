@@ -12,22 +12,20 @@ apply plugin: 'maven-publish'
 
 kotlin {
     jvm()
-//    js {
-//        browser {
-//        }
-//        nodejs {
-//        }
-//    }
+    js {
+        browser {
+        }
+        nodejs {
+        }
+    }
     // For ARM, should be changed to iosArm32 or iosArm64
     // For Linux, should be changed to e.g. linuxX64
     // For MacOS, should be changed to e.g. macosX64
     // For Windows, should be changed to e.g. mingwX64
-//    macosX64("macos")
     sourceSets {
         commonMain {
             dependencies {
                 implementation kotlin('stdlib-common')
-//                implementation "com.soywiz:korma:1.5.0"
                 implementation "com.soywiz:kds:1.5.0"
             }
         }
@@ -48,19 +46,15 @@ kotlin {
                 implementation kotlin('test-junit')
             }
         }
-//        jsMain {
-//            dependencies {
-//                implementation kotlin('stdlib-js')
-//            }
-//        }
-//        jsTest {
-//            dependencies {
-//                implementation kotlin('test-js')
-//            }
-//        }
-//        macosMain {
-//        }
-//        macosTest {
-//        }
+        jsMain {
+            dependencies {
+                implementation kotlin('stdlib-js')
+            }
+        }
+        jsTest {
+            dependencies {
+                implementation kotlin('test-js')
+            }
+        }
     }
 }
