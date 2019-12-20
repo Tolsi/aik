@@ -1,4 +1,4 @@
-rootProject.name = 'aik-geom'
+rootProject.name = 'aik'
 
 
 enableFeaturePreview('GRADLE_METADATA')
