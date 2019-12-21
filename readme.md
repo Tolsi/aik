@@ -24,6 +24,8 @@ I chose the geometric shapes that I used and the most popular in my opinion from
 
 ☑ [Line](https://en.wikipedia.org/wiki/Line_(geometry\))
 
+☐ [Polyline](https://en.wikipedia.org/wiki/Polygonal_chain)
+
 ☐ [Ray](https://en.wikipedia.org/wiki/Line_(geometry\)#Ray) - half-open directed line segment
 
 ☐ [LineSegment](https://en.wikipedia.org/wiki/Line_segment) - closed line segment.  Also it is [Vector2D](https://en.wikipedia.org/wiki/Euclidean_vector)
