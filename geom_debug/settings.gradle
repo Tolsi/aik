@@ -1,0 +1,3 @@
+rootProject.name = 'aik-debug'
+
+enableFeaturePreview('GRADLE_METADATA')

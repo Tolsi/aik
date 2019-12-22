@@ -1,4 +1,1 @@
-rootProject.name = 'aik'
-
-
-enableFeaturePreview('GRADLE_METADATA')
+include ':geom', ':geom_debug'

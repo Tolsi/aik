@@ -227,7 +227,7 @@ val Point.down get(): Point = this.copy(y = this.y - 1)
 val Point.left get(): Point = this.copy(x = this.x - 1)
 val Point.neighbours get(): List<Point> = listOf(up,  down, right, left)
 
-fun Point.directionTo(p: Point): List<Direction> {
+fun Point.directionsTo(p: Point): List<Direction> {
     val directions = mutableListOf<Direction>()
 
     if (x > p.x) {

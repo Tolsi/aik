@@ -3,11 +3,12 @@ package ru.tolsi.aik.geom.draw
 import java.awt.*
 import java.awt.geom.AffineTransform
 import javax.swing.*
-
+//import org.locationtech
 
 object SwingApp {
     @JvmStatic
     fun main(args: Array<String>) {
+//        LineString()
         val panel = GeometricPanelWithZoom()
         val zoom = ImageZoom(panel)
         val f = JFrame()

@@ -82,9 +82,9 @@ data class Rectangle(
 
     fun setToIntersection(a: Rectangle, b: Rectangle) = this.apply { a.intersection(b, this) }
 
-    infix fun intersection(that: Rectangle) = intersection(that, Rectangle())
+    infix fun intersection(that: Rectangle): Rectangle? = intersection(that, Rectangle())
 
-    fun intersection(that: Rectangle, target: Rectangle = Rectangle()) = if (this intersects that) target.setBounds(
+    fun intersection(that: Rectangle, target: Rectangle = Rectangle()): Rectangle? = if (this intersects that) target.setBounds(
         max(this.left, that.left), max(this.top, that.top),
         min(this.right, that.right), min(this.bottom, that.bottom)
     ) else null

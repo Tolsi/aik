@@ -138,8 +138,14 @@ fun List<IPoint>.containsPoint(x: Double, y: Double): Boolean {
     return (intersections % 2) != 0
 }
 
+// https://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm
+fun Shape2d.Polygon.intersection(clipper: Line): List<Point> {
+    return this.closedPoints.windowed(2)
+        .mapNotNull { Line(it.get(0), it.get(1)).intersects(clipper) }
+}
+
 // Implements Sutherland–Hodgman algorithm
-fun Shape2d.clip(clipper: Shape2d): Shape2d.Polygon {
+fun Shape2d.Polygon.clip(clipper: Shape2d.Polygon): Shape2d.Polygon {
 //    require(this.closed && clipper.closed)
     // todo what if it is inside of clipper?
 //    if (this.getAllPoints().all { clipper.containsPoint(it.x, it.y) }) {
@@ -354,7 +360,7 @@ fun Shape2d.Polygon.travellingSalesmanProblem(): Shape2d.Polygon {
 
 fun Shape2d.Polygon.simplify(): Shape2d.Polygon {
     val result = closedPoints.windowed(2).fold(null as Direction? to listOf<Point>()) { (lastDirection, points), (f, s) ->
-        val newDirection = f.directionTo(s).first()
+        val newDirection = f.directionsTo(s).first()
         val newPoints = if (lastDirection == null || lastDirection != newDirection) {
             points.plus(f)
         } else {

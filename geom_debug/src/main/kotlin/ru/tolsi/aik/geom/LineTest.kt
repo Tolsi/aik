@@ -20,6 +20,6 @@ object LineTest {
             Point(200, 250),
             Point(300, 200), false, false)
         val rec = Shape2d.Line(100, 100, 200, 200)
-        println(rec.clip(tri))
+//        println(rec.clip(tri))
     }
 }
