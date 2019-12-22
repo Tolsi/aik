@@ -20,13 +20,13 @@ For some operations, objects with integer points will be declared.
 
 I chose the geometric shapes that I used and the most popular in my opinion from the [wiki list](https://en.wikipedia.org/wiki/List_of_two-dimensional_geometric_shapes).
 
-☑ [Point](https://en.wikipedia.org/wiki/Point_(geometry\)). Also it is Vector1D
+☑ [Point](https://en.wikipedia.org/wiki/Point_(geometry)). Also it is Vector1D
 
-☑ [Line](https://en.wikipedia.org/wiki/Line_(geometry\))
+☑ [Line](https://en.wikipedia.org/wiki/Line_(geometry))
 
 ☐ [Polyline](https://en.wikipedia.org/wiki/Polygonal_chain)
 
-☐ [Ray](https://en.wikipedia.org/wiki/Line_(geometry\)#Ray) - half-open directed line segment
+☐ [Ray](https://en.wikipedia.org/wiki/Line_(geometry)#Ray) - half-open directed line segment
 
 ☐ [LineSegment](https://en.wikipedia.org/wiki/Line_segment) - closed line segment.  Also it is [Vector2D](https://en.wikipedia.org/wiki/Euclidean_vector)
 
@@ -34,7 +34,7 @@ I chose the geometric shapes that I used and the most popular in my opinion from
 
 ☑ [Rectangle](https://en.wikipedia.org/wiki/Rectangle)
 
-☑ [Square](https://en.wikipedia.org/wiki/Square_(geometry\)) ([topics](https://en.wikipedia.org/wiki/List_of_circle_topics)
+☑ [Square](https://en.wikipedia.org/wiki/Square_(geometry)) ([topics](https://en.wikipedia.org/wiki/List_of_circle_topics))
 
 ☐ [Parallelogram](https://en.wikipedia.org/wiki/Parallelogram)
 
@@ -42,7 +42,7 @@ I chose the geometric shapes that I used and the most popular in my opinion from
 
 ☐ [Polygon](https://en.wikipedia.org/wiki/Polygon) ([topics](https://en.wikipedia.org/wiki/List_of_polygons,_polyhedra_and_polytopes)) - simple convex polygons
 
-☐ [Vertex](https://en.wikipedia.org/wiki/Vertex_(geometry\))
+☐ [Vertex](https://en.wikipedia.org/wiki/Vertex_(geometry))
 
 ☐ Triangle Vertex - vertex with additional information about the triangle
 
@@ -52,7 +52,7 @@ I chose the geometric shapes that I used and the most popular in my opinion from
 
 ☐ [Circular segment](https://en.wikipedia.org/wiki/Circular_segment)
 
-☐ [Ring](https://en.wikipedia.org/wiki/Annulus_(mathematics\))
+☐ [Ring](https://en.wikipedia.org/wiki/Annulus_(mathematics))
 
 ☐ [Ellipse](https://en.wikipedia.org/wiki/Ellipse)
 
@@ -60,6 +60,6 @@ I chose the geometric shapes that I used and the most popular in my opinion from
 
 ☐ [Rhombus](https://en.wikipedia.org/wiki/Rhombus)
 
-☐ [Kite](https://en.wikipedia.org/wiki/Kite_(geometry\))
+☐ [Kite](https://en.wikipedia.org/wiki/Kite_(geometry)
 
 
