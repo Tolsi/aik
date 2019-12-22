@@ -60,6 +60,6 @@ I chose the geometric shapes that I used and the most popular in my opinion from
 
 ☐ [Rhombus](https://en.wikipedia.org/wiki/Rhombus)
 
-☐ [Kite](https://en.wikipedia.org/wiki/Kite_(geometry)
+☐ [Kite](https://en.wikipedia.org/wiki/Kite_(geometry))
 
 
