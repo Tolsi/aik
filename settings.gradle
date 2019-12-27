@@ -1,1 +1,1 @@
-include ':geom', ':geom_debug'
+include ':geom', ':geom_debug', ':ai'
