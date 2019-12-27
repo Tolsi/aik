@@ -2,11 +2,12 @@ package ru.tolsi.aik.ai
 
 import com.soywiz.kds.Queue
 import com.soywiz.kds.Stack
+import ru.tolsi.aik.geom.IPoint
 import ru.tolsi.aik.geom.Point
 import ru.tolsi.aik.geom.neighbours
 
-fun Collection<Point>.dfs(from: Point, to: Point): List<Point>? {
-    val allowedPaths = Stack<List<Point>>()
+fun Collection<IPoint>.dfs(from: IPoint, to: IPoint): List<IPoint>? {
+    val allowedPaths = Stack<List<IPoint>>()
 //    val allowedPaths = Queue<List<Point>>()
     allowedPaths.push(listOf(from))
     if (from == to) {
@@ -28,9 +29,9 @@ fun Collection<Point>.dfs(from: Point, to: Point): List<Point>? {
     return null
 }
 
-fun Collection<Point>.bfs(from: Point, to: Point): List<Point>? {
+fun Collection<IPoint>.bfs(from: Point, to: Point): List<IPoint>? {
 //    val allowedPaths = Stack<List<Point>>()
-    val allowedPaths = Queue<List<Point>>()
+    val allowedPaths = Queue<List<IPoint>>()
     allowedPaths.enqueue(listOf(from))
     if (from == to) {
         return allowedPaths.first()

@@ -2,19 +2,16 @@ package ru.tolsi.aik.ai
 
 import com.soywiz.kds.Queue
 import com.soywiz.kds.Stack
-import ru.tolsi.aik.geom.Point
-import ru.tolsi.aik.geom.Polygon
-import ru.tolsi.aik.geom.neighbours
-import ru.tolsi.aik.geom.toPolygon
+import ru.tolsi.aik.geom.*
 
 // recommended
-fun Collection<Point>.twoWaysBfsTravellingSalesmanProblem(): List<Point>? {
+fun Collection<IPoint>.twoWaysBfsTravellingSalesmanProblem(): List<IPoint>? {
 
     if (this.size % 2 != 0) return null
     // dfs
     // val allowedPaths = Stack<Pair<List<Point>, List<Point>>>()
     // bfs
-    val allowedPaths = Queue<Pair<List<Point>, List<Point>>>()
+    val allowedPaths = Queue<Pair<List<IPoint>, List<IPoint>>>()
     val sortedPoints = this.groupBy { it.x }.flatMap { it.value.sortedBy { it.y } }
     val startAndPreEndPoint = sortedPoints.first()
     allowedPaths.enqueue(listOf(startAndPreEndPoint) to listOf())
@@ -44,9 +41,9 @@ fun Collection<Point>.twoWaysBfsTravellingSalesmanProblem(): List<Point>? {
 }
 
 // too slow
-fun Collection<Point>.dfsTravellingSalesmanProblem(): List<Point>? {
+fun Collection<IPoint>.dfsTravellingSalesmanProblem(): List<IPoint>? {
     // dfs
-    val allowedPaths = Stack<List<Point>>()
+    val allowedPaths = Stack<List<IPoint>>()
     // bfs
 //    val allowedPaths = Queue<List<Point>>()
     val sortedPoints = this.groupBy { it.x }.flatMap { it.value.sortedBy { it.y } }
