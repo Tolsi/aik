@@ -30,7 +30,7 @@ interface ITriangle: IPolygon {
      *         edges, <code>false</code> otherwise.
      */
 // In a triangle to check if contains and edge is enough to check if it contains the two vertices.
-    fun containsEdge(edge: Edge): Boolean = containsEdgePoints(edge.p, edge.q)
+    fun containsEdge(edge: Edge): Boolean = containsEdgePoints(edge.line.from, edge.line.from)
 
     // In a triangle to check if contains and edge is enough to check if it contains the two vertices.
     fun containsEdgePoints(p1: IPoint, p2: IPoint): Boolean = containsPoint(p1) && containsPoint(p2)
@@ -91,7 +91,7 @@ interface ITriangle: IPolygon {
     }
 }
 
-data class Triangle private constructor(override val p0: IPoint, override val p1: IPoint, override val p2: IPoint) : ITriangle {
+open class Triangle private constructor(override val p0: IPoint, override val p1: IPoint, override val p2: IPoint) : ITriangle {
     override val points: IPointArrayList =
         PointArrayList(3).apply { add(p0).add(p1).add(p2) }
 

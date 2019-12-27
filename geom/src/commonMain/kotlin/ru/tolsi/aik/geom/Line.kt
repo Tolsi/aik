@@ -10,7 +10,7 @@ interface ILine: Figure2D {
     fun intersects(l: ILine): Point?
 
     fun isBound(p: IPoint): Boolean {
-        return (line.from == point) || (line.to == point)
+        return (from == p) || (to == p)
     }
 
     val length: Double
@@ -147,7 +147,7 @@ interface ILine: Figure2D {
     }
 }
 
-data class Line(override val from: Point, override val to: Point): ILine {
+open class Line(override val from: Point, override val to: Point): ILine {
 
     init {
         require(from != to)

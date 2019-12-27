@@ -1,6 +1,6 @@
 package ru.tolsi.aik.geom
 
-data class Edge internal constructor(
+open class Edge internal constructor(
     val parent: Figure2D,
     val line: LineSegment
 ): ILine by line {

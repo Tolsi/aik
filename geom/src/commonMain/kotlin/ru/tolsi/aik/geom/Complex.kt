@@ -1,7 +1,7 @@
 package ru.tolsi.aik.geom
 
 
-data class Complex(val items: List<IPolygon>) : IPolygon {
+open class Complex(val items: List<IPolygon>) : IPolygon {
     override val points by lazy { items.map { it.points }.flatten() }
     override val closed: Boolean = false
     override fun containsPoint(x: Double, y: Double): Boolean = this.getAllPoints().contains(x, y)

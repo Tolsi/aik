@@ -13,7 +13,7 @@ interface IPolygon: Figure2D, WithArea {
     fun edges(): List<Line> { return closedPoints().windowed(2).map { it.toLine() } }
 }
 
-data class Polygon(override val points: IPointArrayList) : IPolygon {
+open class Polygon(override val points: IPointArrayList) : IPolygon {
     override fun containsPoint(x: Double, y: Double): Boolean = this.points.contains(x, y)
     override val area: Double
         get() {
@@ -34,10 +34,10 @@ data class Polygon(override val points: IPointArrayList) : IPolygon {
 
 fun Polygon.simplify(): Polygon {
     val result =
-        edges().fold(null as Direction? to listOf<Point>()) { (lastDirection, points), (f, s) ->
-            val newDirection = f.directionsTo(s).first()
+        edges().fold(null as Direction? to listOf<Point>()) { (lastDirection, points), line ->
+            val newDirection = line.from.directionsTo(line.to).first()
             val newPoints = if (lastDirection == null || lastDirection != newDirection) {
-                points.plus(f)
+                points.plus(line.from)
             } else {
                 points
             }

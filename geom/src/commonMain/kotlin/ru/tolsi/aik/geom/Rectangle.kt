@@ -31,7 +31,7 @@ fun Iterable<IPoint>.closestPoint(from: IPoint): IPoint? {
     return this.sortedBy { from.distanceTo(it) }.firstOrNull()
 }
 
-data class Rectangle(
+open class Rectangle(
     override var x: Double, override var y: Double,
     override var width: Double, override var height: Double
 ) : IRectangle {
