@@ -1,7 +1,8 @@
 package ru.tolsi.aik.geom
 
-import com.soywiz.kds.*
-import kotlin.math.*
+import com.soywiz.kds.DoubleArrayList
+import com.soywiz.kds.IntArrayList
+import kotlin.math.round
 
 interface IPointArrayList: List<Point> {
     override val size: Int
@@ -209,4 +210,14 @@ private fun IntArrayList.swap(indexA: Int, indexB: Int) {
     val tmp = this[indexA]
     this[indexA] = this[indexB]
     this[indexB] = tmp
+}
+
+fun Collection<IPointArrayList>.flatten(): PointArrayList {
+    val r = PointArrayList()
+    this.forEach { l ->
+        for (i in l.indices) {
+            r.add(l.getX(i), l.getY(i))
+        }
+    }
+    return r
 }

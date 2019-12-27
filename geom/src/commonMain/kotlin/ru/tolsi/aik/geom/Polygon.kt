@@ -2,11 +2,10 @@ package ru.tolsi.aik.geom
 
 import kotlin.math.abs
 
-data class Polygon(val points: IPointArrayList) : GeometricFigure2D, WithArea {
-    override val paths = listOf(points)
+data class Polygon(override val points: IPointArrayList) : GeometricFigure2D, WithArea {
     override val closed: Boolean = true
     val closedPoints by lazy {
-        points.plus(points.first())
+        this.points.plus(this.points.first())
     }
 
     override fun containsPoint(x: Double, y: Double): Boolean = this.points.contains(x, y)
@@ -16,9 +15,9 @@ data class Polygon(val points: IPointArrayList) : GeometricFigure2D, WithArea {
             var area = 0.0
 
             // Calculate value of shoelace formula
-            var j = points.size - 1
-            points.indices.forEach { i ->
-                area += (points.getX(j) + points.getX(i)) * (points.getY(j) - points.getY(i))
+            var j = this.points.size - 1
+            this.points.indices.forEach { i ->
+                area += (this.points.getX(j) + this.points.getX(i)) * (this.points.getY(j) - this.points.getY(i))
                 j = i  // j is previous vertex to i
             }
 
@@ -108,7 +107,7 @@ private fun clip(polygon: Polygon, p1: Point, p2: Point): Polygon {
             // and the second point is added
             val l1 = Line(Point(x1, y1), Point(x2, y2))
             val l2 = Line(Point(ix, iy), Point(kx, ky))
-            newPolygonPoints.add(l1.infiniteIntersects(l2)!!)
+            newPolygonPoints.add(l1.intersectsAsLine(l2)!!)
             newPolygonPoints.add(Point(kx, ky))
         }
         // Case 3: When only second point is outside
@@ -116,7 +115,7 @@ private fun clip(polygon: Polygon, p1: Point, p2: Point): Polygon {
             //Only point of intersection with edge is added
             val l1 = Line(Point(x1, y1), Point(x2, y2))
             val l2 = Line(Point(ix, iy), Point(kx, ky))
-            newPolygonPoints.add(l1.infiniteIntersects(l2)!!)
+            newPolygonPoints.add(l1.intersectsAsLine(l2)!!)
         }
         // Case 4: When both points are outside
         else {
@@ -149,7 +148,7 @@ fun Polygon.lineView(clipper: Line): Line? {
 
 fun Polygon.isPointInside(point: Point): Boolean {
     return this.closedPoints.windowed(2).asSequence()
-        .any { Line(it.get(0), it.get(1)).infiniteIntersects(point) } && edgeIntersections(
+        .any { Line(it.get(0), it.get(1)).intersectsAsLine(point) } && edgeIntersections(
         Line(
             point,
             point.right

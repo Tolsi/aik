@@ -1,13 +1,11 @@
 package ru.tolsi.aik.geom
 
-import ru.tolsi.aik.geom.*
-
 interface WithArea {
     val area: Double
 }
 
 interface GeometricFigure2D {
-    val paths: List<IPointArrayList>
+    val points: IPointArrayList
     val closed: Boolean
     fun containsPoint(x: Double, y: Double): Boolean = false
     fun containsPoint(p: Point): Boolean = containsPoint(p.x, p.y)
@@ -29,13 +27,13 @@ fun IPointArrayList.toGeometricFigure2D(closed: Boolean = true): GeometricFigure
 }
 
 fun GeometricFigure2D.getAllPoints(out: PointArrayList = PointArrayList()): PointArrayList =
-    out.apply { for (path in this@getAllPoints.paths) add(path) }
+    out.apply { for (path in this@getAllPoints.points) add(path) }
 
 fun GeometricFigure2D.toPolygon(): Polygon = if (this is Polygon) this else Polygon(this.getAllPoints())
 
 // todo for drop same by EPS points
 fun GeometricFigure2D.merge(figure: GeometricFigure2D): Polygon? {
-    val allPoints = this.paths.flatten().plus(figure.paths.flatten())
+    val allPoints = this.points.plus(figure.points)
     val uniquePoints = allPoints.distinct()
     val canBeMerged = uniquePoints.size <= allPoints.size - 2
     return if (canBeMerged) {

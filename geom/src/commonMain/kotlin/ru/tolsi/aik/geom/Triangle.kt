@@ -1,6 +1,5 @@
 package ru.tolsi.aik.geom
 
-import ru.tolsi.aik.geom.*
 import kotlin.math.abs
 
 interface Triangle {
@@ -10,8 +9,8 @@ interface Triangle {
 
     data class Base(override val p0: IPoint, override val p1: IPoint, override val p2: IPoint) : Triangle,
         GeometricFigure2D {
-        override val paths: List<IPointArrayList> =
-            listOf(PointArrayList(3).apply { add(p0).add(p1).add(p2) })
+        override val points: IPointArrayList =
+            PointArrayList(3).apply { add(p0).add(p1).add(p2) }
         override val closed: Boolean = true
     }
 
