@@ -225,11 +225,11 @@ fun Iterable<IPoint>.getPolylineLength(): Double {
     return out
 }
 
-val Point.up get(): Point = this.copy(y = this.y + 1)
-val Point.right get(): Point = this.copy(x = this.x + 1)
-val Point.down get(): Point = this.copy(y = this.y - 1)
-val Point.left get(): Point = this.copy(x = this.x - 1)
-val Point.neighbours get(): List<Point> = listOf(up,  down, right, left)
+val IPoint.up get(): IPoint = Point(x, this.y + 1)
+val IPoint.right get(): IPoint = Point(this.x + 1, y)
+val IPoint.down get(): IPoint = Point(x, this.y - 1)
+val IPoint.left get(): IPoint = Point(this.x - 1, y)
+val IPoint.neighbours get(): List<IPoint> = listOf(up,  down, right, left)
 
 fun List<IPoint>.containsPoint(x: Double, y: Double): Boolean {
     var intersections = 0

@@ -32,7 +32,7 @@ enum class Direction(val step: Point) {
 
 }
 
-fun Point.directionsTo(p: Point): List<Direction> {
+fun IPoint.directionsTo(p: IPoint): List<Direction> {
     val directions = mutableListOf<Direction>()
 
     if (x > p.x) {

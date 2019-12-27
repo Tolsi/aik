@@ -34,7 +34,7 @@ open class Polygon(override val points: IPointArrayList) : IPolygon {
 
 fun Polygon.simplify(): Polygon {
     val result =
-        edges().fold(null as Direction? to listOf<Point>()) { (lastDirection, points), line ->
+        edges().fold(null as Direction? to emptyList<IPoint>()) { (lastDirection, points), line ->
             val newDirection = line.from.directionsTo(line.to).first()
             val newPoints = if (lastDirection == null || lastDirection != newDirection) {
                 points.plus(line.from)
@@ -51,7 +51,7 @@ fun List<IPoint>.toPolygon(): Polygon {
 }
 
 // https://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm
-fun Polygon.intersection(clipper: Line): List<Point> {
+fun Polygon.intersection(clipper: Line): List<IPoint> {
     return this.edges()
         .mapNotNull { it.intersects(clipper) }
 }
@@ -77,8 +77,8 @@ fun Polygon.clip(clipper: Polygon): Polygon {
 // https://www.geeksforgeeks.org/polygon-clipping-sutherland-hodgman-algorithm-please-change-bmp-images-jpeg-png/
 // This functions clips all the edges w.r.t one clip
 // edge of clipping area
-private fun clip(polygon: Polygon, p1: Point, p2: Point): Polygon {
-    val newPolygonPoints = mutableSetOf<Point>()
+private fun clip(polygon: Polygon, p1: IPoint, p2: IPoint): Polygon {
+    val newPolygonPoints = mutableSetOf<IPoint>()
     val x1 = p1.x
     val y1 = p1.y
     val x2 = p2.x
@@ -134,7 +134,7 @@ private fun clip(polygon: Polygon, p1: Point, p2: Point): Polygon {
 
 fun Rectangle.toPolygon(): Polygon = this.points.toPolygon()
 
-fun Polygon.edgeIntersections(clipper: Line): Sequence<Point> {
+fun Polygon.edgeIntersections(clipper: Line): Sequence<IPoint> {
     return this.edges().asSequence()
         .mapNotNull { it.intersects(clipper) }
 }
@@ -152,7 +152,7 @@ fun Polygon.lineView(clipper: Line): Line? {
     }
 }
 
-fun Polygon.isPointInside(point: Point): Boolean {
+fun Polygon.isPointInside(point: IPoint): Boolean {
     return this.edges().asSequence()
         .any { it.intersectsAsLine(point) } && edgeIntersections(
         Line(

@@ -3,11 +3,11 @@ package ru.tolsi.aik.geom
 import kotlin.math.*
 
 interface ILine: Figure2D {
-    val from: Point
-    val to: Point
+    val from: IPoint
+    val to: IPoint
 
-    fun intersects(p: Point): Boolean
-    fun intersects(l: ILine): Point?
+    fun intersects(p: IPoint): Boolean
+    fun intersects(l: ILine): IPoint?
 
     fun isBound(p: IPoint): Boolean {
         return (from == p) || (to == p)
@@ -16,7 +16,7 @@ interface ILine: Figure2D {
     val length: Double
         get() = from.distanceTo(to)
 
-    fun distance(p: Point): Double {
+    fun distance(p: IPoint): Double {
         val v = to - from
         val w = p - from
         val c1 = w.dot(v)
@@ -34,26 +34,26 @@ interface ILine: Figure2D {
     fun b(): Double = from.x - to.x
     fun c(): Double = from.x * to.y - to.x * from.y
 
-    fun isInRectangleBetweenPoints(p: Point): Boolean {
+    fun isInRectangleBetweenPoints(p: IPoint): Boolean {
         return (p.x >= min(from.x, to.x) && p.x <= max(from.x, to.x) &&
                 p.y >= min(from.y, to.y) && p.y <= max(from.y, to.y))// || isPointTooClose(p)
     }
 
-    fun intersectsAsSegment(p: Point): Boolean {
+    fun intersectsAsSegment(p: IPoint): Boolean {
         return intersectsAsLine(p) && isInRectangleBetweenPoints(p)
     }
 
-    fun intersectsAsRay(p: ILine): Point? {
+    fun intersectsAsRay(p: ILine): IPoint? {
         return intersects(p)?.takeIf {
             it.isDirectedTo(from.directionsTo(to))
         }
     }
 
-    fun intersectsAsRay(p: Point): Boolean {
+    fun intersectsAsRay(p: IPoint): Boolean {
         return intersectsAsLine(p) && p.isDirectedTo(from.directionsTo(to))
     }
 
-    fun intersectsAsLine(p: Point): Boolean =
+    fun intersectsAsLine(p: IPoint): Boolean =
         if (a() <= Geometry.EPS) {
             from.y - p.y <= Geometry.EPS
         } else if (b() <= Geometry.EPS) {
@@ -62,19 +62,19 @@ interface ILine: Figure2D {
             (p.x - from.x) / (to.x - from.x) - (p.y - from.y) / (to.y - from.y) <= Geometry.EPS
         }
 
-    fun intersectsAsLine(p: ILine): Point? {
+    fun intersectsAsLine(p: ILine): IPoint? {
         val d = (this.b() * p.a() - this.a() * p.b())
         val x = (this.c() * p.b() - this.b() * p.c()) / d
         val y = (this.c() * p.a() - this.a() * p.c()) / d
-        return Point(x, y).takeIf { x.isFinite() && y.isFinite() }
+        return IPoint(x, y).takeIf { x.isFinite() && y.isFinite() }
     }
 
-    fun intersectsAsSegment(l: ILine): Point? {
+    fun intersectsAsSegment(l: ILine): IPoint? {
         return points.find { l.intersects(it) }
             ?: intersectsAsLine(l)?.takeIf { isInRectangleBetweenPoints(it) && l.isInRectangleBetweenPoints(it) }
     }
 
-    fun Point.isDirectedTo(lineDirections: List<Direction>): Boolean {
+    fun IPoint.isDirectedTo(lineDirections: List<Direction>): Boolean {
         // todo не противоположные
         return when (lineDirections.size) {
             0 -> this == from && this == to
@@ -106,8 +106,8 @@ interface ILine: Figure2D {
         }
     }
 
-    fun interpolateBy(step: Point) = sequence {
-        val current: Point = from.copy()
+    fun interpolateBy(step: IPoint) = sequence {
+        val current: Point = from.copy().mutable
         while (from.distanceTo(current) < length) {
             current.add(step)
             yield(current)
@@ -115,19 +115,19 @@ interface ILine: Figure2D {
     }
 
     fun times(n: Double): LineSegment {
-        return LineSegment(from, Point(from.x + (to.x - from.x) * n, from.y + (to.y - from.y) * n))
+        return LineSegment(from, IPoint(from.x + (to.x - from.x) * n, from.y + (to.y - from.y) * n))
     }
 
     fun normalize(): LineSegment {
         val normX = (to.x - from.x) / length
         val normY = (to.y - from.y) / length
-        return LineSegment(Point.Zero.mutable, Point(normX, normY).mutable)
+        return LineSegment(Point.Zero.mutable, IPoint(normX, normY).mutable)
     }
 
     fun toLenghtOneLine(): LineSegment {
         val normX = (to.x - from.x) / length
         val normY = (to.y - from.y) / length
-        return LineSegment(from, from.plus(Point(normX, normY)).mutable)
+        return LineSegment(from, from.plus(IPoint(normX, normY)).mutable)
     }
 
     fun withLength(length: Double): LineSegment {
@@ -137,23 +137,23 @@ interface ILine: Figure2D {
     override val points get() = PointArrayList(2).apply { add(from).add(to) }
     override val closed: Boolean get() = false
 
-    fun moveTo(point: Point): Line {
+    fun moveTo(IPoint: IPoint): Line {
         val normalized = this.toLenghtOneLine().normalize()
-        return Line(point, point.plus(normalized.to).mutable)
+        return Line(IPoint, IPoint.plus(normalized.to).mutable)
     }
 
-    fun toPair(): Pair<Point, Point> {
+    fun toPair(): Pair<IPoint, IPoint> {
         return this.from to this.to
     }
 }
 
-open class Line(override val from: Point, override val to: Point): ILine {
+open class Line(override val from: IPoint, override val to: IPoint): ILine {
 
     init {
         require(from != to)
     }
 
-//    private fun isPointTooClose(p: Point): Boolean {
+//    private fun isPointTooClose(p: IPoint): Boolean {
 //        return (abs(p.x - from.x) <= Geometry.EPS &&
 //                abs(p.x - to.x) <= Geometry.EPS) ||
 //                (abs(p.y - from.y) <= Geometry.EPS &&
@@ -161,11 +161,11 @@ open class Line(override val from: Point, override val to: Point): ILine {
 //    }
 
 
-    override fun distance(p: Point): Double {
+    override fun distance(p: IPoint): Double {
         return abs((to.y - from.y) * p.x - (to.x - from.x) * p.y + to.x * from.y - to.y * from.x) / sqrt((to.y - from.y).pow(2.0) + (to.x - from.x).pow(2.0))
     }
 
-    fun points(): List<Point> = listOf(from, to)
+    fun points(): List<IPoint> = listOf(from, to)
     override fun toString(): String {
         return "Line(from=$from, to=$to)"
     }
@@ -173,43 +173,43 @@ open class Line(override val from: Point, override val to: Point): ILine {
     fun rotate(angle: Angle): Line {
         val diffX = to.x - from.x
         val diffY = to.y - from.y
-        val newToPoint = Point(
+        val newToPoint = IPoint(
             diffX * cos(angle.radians) - diffY * sin(angle.radians),
             diffX * sin(angle.radians) + diffY * cos(angle.radians))
         return Line(from, from.plus(newToPoint).mutable)
     }
 
     companion object {
-        operator fun invoke(x1: Number, y1: Number, x2: Number, y2: Number): Line = Line(Point(x1, y1), Point(x2, y2))
+        operator fun invoke(x1: Number, y1: Number, x2: Number, y2: Number): Line = Line(IPoint(x1, y1), IPoint(x2, y2))
 
         // todo limit!
-        fun createFromPointAimAndSpeed(from: Point, aim: Point, speed: Double): Sequence<Point> {
-            val speedPoint = aim.copy()
+        fun createFromPointAimAndSpeed(from: IPoint, aim: IPoint, speed: Double): Sequence<IPoint> {
+            val speedPoint = aim.copy().mutable
             speedPoint.normalize()
             // by ticks
             speedPoint.mul(speed / 60)
-            return Line(from, from.copy().add(speedPoint)).times(150.0).interpolateBy(speedPoint)
+            return Line(from, from.copy().mutable.add(speedPoint)).times(150.0).interpolateBy(speedPoint)
         }
 
-        val OneLenghtZeroAngle = Line(Point(0, 0), Point(1, 0))
+        val OneLenghtZeroAngle = Line(IPoint(0, 0), IPoint(1, 0))
     }
 
-    override fun intersects(p: Point): Boolean {
+    override fun intersects(p: IPoint): Boolean {
         return intersectsAsLine(p)
     }
 
-    override fun intersects(l: ILine): Point? {
+    override fun intersects(l: ILine): IPoint? {
         return intersectsAsLine(l)
     }
 
-    override fun containsPoint(x: Double, y: Double) = intersects(Point(x, y))
+    override fun containsPoint(x: Double, y: Double) = intersects(IPoint(x, y))
 }
 
-fun Collection<Point>.toLine(): Line {
+fun Collection<IPoint>.toLine(): Line {
     require(this.size == 2)
     return Line(this.elementAt(0), this.elementAt(1))
 }
 
-fun Pair<Point, Point>.toLine(): Line {
+fun Pair<IPoint, IPoint>.toLine(): Line {
     return Line(this.first, this.second)
 }
