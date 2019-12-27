@@ -6,6 +6,8 @@ import ru.tolsi.aik.geom.*
 
 abstract class Tile
 
+abstract class EmptyTile
+
 abstract class Game {}
 
 class GameField<T : Tile>(val tiles: Array2<Tile>) :
@@ -38,5 +40,16 @@ class GameField<T : Tile>(val tiles: Array2<Tile>) :
         }
 
         return result.map { it.travellingSalesmanProblem() }.map { it.simplify() }.toList()
+    }
+
+    fun Point.onTile(): Tile? {
+        val x = this.x.toInt()
+        val y = this.y.toInt()
+        return if (y >= 0 && y <= height
+            && x >= 0 && x <= width) {
+            return tiles[x, y]
+        } else {
+            null
+        }
     }
 }

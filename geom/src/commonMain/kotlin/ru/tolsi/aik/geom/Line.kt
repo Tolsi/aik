@@ -145,6 +145,18 @@ interface ILine: Figure2D {
     fun toPair(): Pair<IPoint, IPoint> {
         return this.from to this.to
     }
+
+    fun toRay(): Ray {
+        return Ray(from, to)
+    }
+
+    fun toLine(): Line {
+        return Line(from, to)
+    }
+
+    fun toLineSegment(): LineSegment {
+        return LineSegment(from, to)
+    }
 }
 
 open class Line(override val from: IPoint, override val to: IPoint): ILine {

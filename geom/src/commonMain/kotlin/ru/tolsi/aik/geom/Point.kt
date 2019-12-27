@@ -242,7 +242,7 @@ fun List<IPoint>.containsPoint(x: Double, y: Double): Boolean {
 }
 
 
-fun Point.projectTo(l: Line): Point {
+fun IPoint.projectTo(l: Line): Point {
     // get dot product of e1, e2
     val e1 = Point(l.to.x - l.from.x, l.to.y - l.from.y)
     val e2 = Point(x - l.from.x, y - l.from.y)
@@ -255,7 +255,7 @@ fun Point.projectTo(l: Line): Point {
     )
 }
 
-fun Point.toZeroAngleLine(): Line {
+fun IPoint.toZeroAngleLine(): Line {
     return Line(this, this.right)
 }
 
@@ -293,6 +293,6 @@ fun List<Point>.epsContains(p: Point): Boolean {
     return this.any { it.compareTo(p) == 0 }
 }
 
-fun Point.toRectangleWithCenterInPoint(radius: Double): Rectangle {
+fun IPoint.toRectangleWithCenterInPoint(radius: Double): Rectangle {
     return Rectangle(this.x - radius, this.y - radius, radius * 2, radius * 2)
 }

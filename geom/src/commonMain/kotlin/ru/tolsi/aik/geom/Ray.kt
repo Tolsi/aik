@@ -1,6 +1,6 @@
 package ru.tolsi.aik.geom
 
-open class Ray private constructor(override val from: IPoint, override val to: IPoint): ILine {
+open class Ray (override val from: IPoint, override val to: IPoint): ILine {
     override fun intersects(p: IPoint): Boolean {
         return intersectsAsRay(p)
     }
