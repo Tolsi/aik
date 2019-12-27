@@ -177,6 +177,7 @@ interface IPointInt {
     }
 }
 
+// todo make int point without double point?
 inline class PointInt(val p: Point) : IPointInt, Comparable<IPointInt> {
     override fun compareTo(other: IPointInt): Int = compare(this.x, this.y, other.x, other.y)
 
