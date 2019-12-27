@@ -1,8 +1,9 @@
 package ru.tolsi.aik.geom
 
+import ru.tolsi.aik.geom.*
 import kotlin.math.*
 
-data class Line(val from: Point, val to: Point) {
+data class Line(val from: Point, val to: Point) : GeometricFigure2D {
     val length: Double by lazy { from.distanceTo(to) }
 
     init {
@@ -26,31 +27,31 @@ data class Line(val from: Point, val to: Point) {
         return infiniteIntersects(p) && isInRectangleBetweenPoints(p)
     }
 
-    fun isDirectedTo(p: Point, lineDirections: List<Direction>): Boolean {
+    fun Point.isDirectedTo(lineDirections: List<Direction>): Boolean {
         // todo не противоположные
         return when (lineDirections.size) {
-            0 -> p == from && p == to
+            0 -> this == from && this == to
             1 -> when (lineDirections.first()) {
                 Direction.UP ->
-                    p.y > from.y && p.x == from.x
+                    this.y > from.y && this.x == from.x
                 Direction.DOWN ->
-                    p.y < from.y && p.x == from.x
+                    this.y < from.y && this.x == from.x
                 Direction.LEFT ->
-                    p.x < from.x && p.y == from.y
+                    this.x < from.x && this.y == from.y
                 Direction.RIGHT ->
-                    p.x > from.x && p.y == from.y
+                    this.x > from.x && this.y == from.y
             }
             2 -> {
                 val sorted = lineDirections.sortedBy { it.ordinal }
                 when (sorted.first() to sorted.last()) {
                     (Direction.UP to Direction.RIGHT) ->
-                        p.x > from.x && p.y > from.y
+                        this.x > from.x && this.y > from.y
                     (Direction.UP to Direction.LEFT) ->
-                        p.x < from.x && p.y > from.y
+                        this.x < from.x && this.y > from.y
                     (Direction.RIGHT to Direction.DOWN) ->
-                        p.x > from.x && p.y < from.y
+                        this.x > from.x && this.y < from.y
                     (Direction.DOWN to Direction.LEFT) ->
-                        p.x < from.x && p.y < from.y
+                        this.x < from.x && this.y < from.y
                     else -> false
                 }
             }
@@ -59,7 +60,7 @@ data class Line(val from: Point, val to: Point) {
     }
 
     fun intersectsInfiniteDirected(p: Point): Boolean {
-        return infiniteIntersects(p) && isDirectedTo(p, from.directionsTo(to))
+        return infiniteIntersects(p) && p.isDirectedTo(from.directionsTo(to))
     }
 
     fun intersectsInfiniteDirected(p: Line): Point? {
@@ -68,7 +69,7 @@ data class Line(val from: Point, val to: Point) {
 
     fun intersectsDirected(p: Line): Point? {
         return intersects(p)?.takeIf {
-            isDirectedTo(it, from.directionsTo(to))
+            it.isDirectedTo(from.directionsTo(to))
         }
     }
 
@@ -168,7 +169,7 @@ data class Line(val from: Point, val to: Point) {
             return Line(from, from.copy().add(speedPoint)).times(150.0).interpolateBy(speedPoint)
         }
 
-// todo make global bounds?
+// todo make global bounds? make a ray
 //        fun fromPointAndAngle(from: Point, angle: Point): Line {
 //            val speedPoint = angle.copy().normalize()
 //            val infiniteLine = Line(from, speedPoint)
@@ -178,9 +179,23 @@ data class Line(val from: Point, val to: Point) {
 
         val OneLenghtZeroAngle = Line(Point(0, 0), Point(1, 0))
     }
+
+    override val paths get() = listOf(PointArrayList(2).apply { add(from).add(to) })
+    override val closed: Boolean = false
+    override fun containsPoint(x: Double, y: Double) = intersects(Point(x, y))
 }
 
 fun Collection<Point>.toLine(): Line {
     require(this.size == 2)
     return Line(this.elementAt(0), this.elementAt(1))
+}
+
+fun Pair<Point, Point>.toLine(): Line {
+    return Line(this.first, this.second)
+}
+
+
+fun Line.moveTo(point: Point): Line {
+    val normalized = this.toLenghtOneLine().normalize()
+    return Line(point, point.plus(normalized.to).mutable)
 }

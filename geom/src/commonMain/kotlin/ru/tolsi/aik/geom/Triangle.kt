@@ -1,17 +1,17 @@
-package ru.tolsi.aik.geom.triangle
+package ru.tolsi.aik.geom
 
 import ru.tolsi.aik.geom.*
-import ru.tolsi.aik.geom.shape.Shape2d
-import kotlin.math.*
+import kotlin.math.abs
 
 interface Triangle {
     val p0: IPoint
     val p1: IPoint
     val p2: IPoint
 
-    data class Base(override val p0: IPoint, override val p1: IPoint, override val p2: IPoint) : Triangle, Shape2d() {
+    data class Base(override val p0: IPoint, override val p1: IPoint, override val p2: IPoint) : Triangle,
+        GeometricFigure2D {
         override val paths: List<IPointArrayList> =
-                listOf(PointArrayList(3).apply { add(p0).add(p1).add(p2) })
+            listOf(PointArrayList(3).apply { add(p0).add(p1).add(p2) })
         override val closed: Boolean = true
     }
 

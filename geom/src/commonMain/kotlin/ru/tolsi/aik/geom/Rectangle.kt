@@ -1,16 +1,20 @@
 package ru.tolsi.aik.geom
 
-import ru.tolsi.aik.geom.internal.*
-import kotlin.math.*
+import ru.tolsi.aik.geom.internal.niceStr
+import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.round
 
-interface IRectangle {
+interface IRectangle : GeometricFigure2D, WithArea, Sizeable {
     val x: Double
     val y: Double
     val width: Double
     val height: Double
 
     companion object {
-        inline operator fun invoke(x: Number, y: Number, width: Number, height: Number): IRectangle = Rectangle(x, y, width, height)
+        inline operator fun invoke(x: Number, y: Number, width: Number, height: Number): IRectangle =
+            Rectangle(x, y, width, height)
     }
 }
 
@@ -30,18 +34,23 @@ fun Iterable<IPoint>.closestPoint(from: IPoint): IPoint? {
 data class Rectangle(
     override var x: Double, override var y: Double,
     override var width: Double, override var height: Double
-) : IRectangle, Sizeable {
+) : IRectangle {
     companion object {
         inline operator fun invoke(): Rectangle = Rectangle(0.0, 0.0, 0.0, 0.0)
-        inline operator fun invoke(x: Number, y: Number, width: Number, height: Number): Rectangle = Rectangle(x.toDouble(), y.toDouble(), width.toDouble(), height.toDouble())
-        inline fun fromBounds(left: Number, top: Number, right: Number, bottom: Number): Rectangle = Rectangle().setBounds(left, top, right, bottom)
+        inline operator fun invoke(x: Number, y: Number, width: Number, height: Number): Rectangle =
+            Rectangle(x.toDouble(), y.toDouble(), width.toDouble(), height.toDouble())
+
+        inline fun fromBounds(left: Number, top: Number, right: Number, bottom: Number): Rectangle =
+            Rectangle().setBounds(left, top, right, bottom)
+
         // todo make it +/-
-        fun isContainedIn(a: Rectangle, b: Rectangle): Boolean = a.x >= b.x && a.y >= b.y && a.x + a.width <= b.x + b.width && a.y + a.height <= b.y + b.height
+        fun isContainedIn(a: Rectangle, b: Rectangle): Boolean =
+            a.x >= b.x && a.y >= b.y && a.x + a.width <= b.x + b.width && a.y + a.height <= b.y + b.height
     }
 
     val isEmpty: Boolean get() = area == 0.0
     val isNotEmpty: Boolean get() = area != 0.0
-    val area: Double get() = width * height
+    override val area: Double get() = width * height
     var left: Double; get() = x; set(value) = run { x = value }
     var top: Double; get() = y; set(value) = run { y = value }
     var right: Double; get() = x + width; set(value) = run { width = value - x }
@@ -105,6 +114,11 @@ data class Rectangle(
 
     fun toStringBounds(): String =
         "Rectangle([${left.niceStr},${top.niceStr}]-[${right.niceStr},${bottom.niceStr}])"
+
+    override val paths =
+        listOf(PointArrayList(4) { add(x, y).add(x, y + height).add(x + width, y + height).add(x + width, y) })
+    override val closed: Boolean = true
+    override fun containsPoint(x: Double, y: Double) = (x in this.left..this.right) && (y in this.top..this.bottom)
 
     fun toInt() = RectangleInt(x, y, width, height)
 }
@@ -245,3 +259,40 @@ fun Iterable<Rectangle>.boundLines(target: Rectangle = Rectangle()): Rectangle {
 }
 
 val IRectangle.asRectangle: Rectangle get() = Rectangle(x, y, width, height)
+
+fun IRectangle.bottomSide(): Collection<Point> {
+    return listOf(
+        Point(round(x), y),
+        Point(round(x + width), y)
+    )
+}
+
+fun IRectangle.topSide(): Collection<Point> {
+    return listOf(
+        Point(round(x), y + height),
+        Point(round(x + width), y + height)
+    )
+}
+
+fun IRectangle.leftSide(): Collection<Point> {
+    return listOf(
+        Point(x, round(y)),
+        Point(x, round(y + height))
+    )
+}
+
+fun IRectangle.rightSide(): Collection<Point> {
+    return listOf(
+        Point(x + width, round(y)),
+        Point(x + width, round(y + height))
+    )
+}
+
+fun IRectangle.boundLines(): Collection<Line> {
+    return listOf(
+        this.leftSide().toLine(),
+        this.rightSide().toLine(),
+        this.topSide().toLine(),
+        this.bottomSide().toLine()
+    )
+}

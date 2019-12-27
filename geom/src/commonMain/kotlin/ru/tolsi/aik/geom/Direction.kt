@@ -1,6 +1,6 @@
 package ru.tolsi.aik.geom
 
-import kotlin.math.*
+import kotlin.math.abs
 
 enum class Direction(val step: Point) {
     UP(Point(0, 1)), RIGHT(Point(1, 0)), DOWN(Point(0, -1)), LEFT(Point(-1, 0));
@@ -30,4 +30,22 @@ enum class Direction(val step: Point) {
         return values()[(index + 2) % 4]
     }
 
+}
+
+fun Point.directionsTo(p: Point): List<Direction> {
+    val directions = mutableListOf<Direction>()
+
+    if (x > p.x) {
+        directions.add(Direction.LEFT)
+    } else if (x < p.x) {
+        directions.add(Direction.RIGHT)
+    }
+
+    if (y > p.y) {
+        directions.add(Direction.DOWN)
+    } else if (y < p.y) {
+        directions.add(Direction.UP)
+    }
+
+    return directions
 }

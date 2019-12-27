@@ -2,8 +2,11 @@
 
 package ru.tolsi.aik.geom
 
-import ru.tolsi.aik.geom.internal.*
-import kotlin.math.*
+import ru.tolsi.aik.geom.internal.niceStr
+import kotlin.math.abs
+import kotlin.math.acos
+import kotlin.math.hypot
+import kotlin.math.roundToInt
 
 interface IPoint {
     val x: Double
@@ -227,20 +230,68 @@ val Point.down get(): Point = this.copy(y = this.y - 1)
 val Point.left get(): Point = this.copy(x = this.x - 1)
 val Point.neighbours get(): List<Point> = listOf(up,  down, right, left)
 
-fun Point.directionsTo(p: Point): List<Direction> {
-    val directions = mutableListOf<Direction>()
-
-    if (x > p.x) {
-        directions.add(Direction.LEFT)
-    } else if (x < p.x) {
-        directions.add(Direction.RIGHT)
+fun List<IPoint>.containsPoint(x: Double, y: Double): Boolean {
+    var intersections = 0
+    for (n in 0 until this.size - 1) {
+        val p1 = this[n + 0]
+        val p2 = this[n + 1]
+        intersections += HorizontalLine.intersectionsWithLine(x, y, p1.x, p1.y, p2.x, p2.y)
     }
+    return (intersections % 2) != 0
+}
 
-    if (y > p.y) {
-        directions.add(Direction.DOWN)
-    } else if (y < p.y) {
-        directions.add(Direction.UP)
+
+fun Point.projectTo(l: Line): Point {
+    // get dot product of e1, e2
+    val e1 = Point(l.to.x - l.from.x, l.to.y - l.from.y)
+    val e2 = Point(x - l.from.x, y - l.from.y)
+    val valDp = e1.dot(e2)
+    // get squared length of e1
+    val len = e1.dot(e1)
+    return Point(
+        l.from.x + valDp * e1.x / len,
+        l.from.y + valDp * e1.y / len
+    )
+}
+
+fun Point.toZeroAngleLine(): Line {
+    return Line(this, this.right)
+}
+
+fun List<Point>.epsUnique(): List<Point> {
+    return this.fold(listOf()) { res, p ->
+        if (!res.any { it.compareTo(p) == 0 }) {
+            res.plus(p)
+        } else res
     }
+}
 
-    return directions
+fun List<Point>.epsRemove(remove: Point): List<Point> {
+    return this.fold(mutableListOf()) { res, p ->
+        if (p.compareTo(remove) != 0) {
+            res.add(p)
+            res
+        } else {
+            res
+        }
+    }
+}
+
+fun List<Point>.epsRemove(remove: List<Point>): List<Point> {
+    return this.fold(mutableListOf()) { res, p ->
+        if (remove.all { p.compareTo(it) != 0 }) {
+            res.add(p)
+            res
+        } else {
+            res
+        }
+    }
+}
+
+fun List<Point>.epsContains(p: Point): Boolean {
+    return this.any { it.compareTo(p) == 0 }
+}
+
+fun Point.toRectangleWithCenterInPoint(radius: Double): Rectangle {
+    return Rectangle(this.x - radius, this.y - radius, radius * 2, radius * 2)
 }

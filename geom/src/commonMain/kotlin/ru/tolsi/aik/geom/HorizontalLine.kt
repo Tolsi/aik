@@ -1,7 +1,6 @@
-package ru.tolsi.aik.geom.shape
+package ru.tolsi.aik.geom
 
-import ru.tolsi.aik.geom.Point
-
+// todo move to line
 object HorizontalLine {
     fun intersectionsWithLine(
         ax: Double, ay: Double,
