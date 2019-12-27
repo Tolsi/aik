@@ -2,11 +2,10 @@ package ru.tolsi.aik.geom
 
 data class Edge internal constructor(
     val parent: GeometricFigure2D,
-    val p: IPoint,
-    val q: IPoint
-) {
+    val line: LineSegment
+): ILine by line {
     @Suppress("unused")
-    fun hasPoint(point: IPoint): Boolean = (p == point) || (q == point)
+    fun hasPoint(point: IPoint): Boolean = line.isBound(point)
 
     companion object {
         operator fun invoke(parent: GeometricFigure2D, p1: IPoint, p2: IPoint): Edge {
@@ -18,9 +17,9 @@ data class Edge internal constructor(
         }
 
         fun getUniquePointsFromEdges(edges: Iterable<Edge>): List<IPoint> =
-            edges.flatMap { listOf(it.p, it.q) }.distinct()
+            edges.flatMap { listOf(it.line.from, it.line.to) }.distinct()
     }
 
-    override fun toString(): String = "Edge(${this.p}, ${this.q})"
+    override fun toString(): String = "Edge(${this.line}) of ${this.parent}"
 }
 

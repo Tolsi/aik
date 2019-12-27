@@ -2,17 +2,98 @@ package ru.tolsi.aik.geom
 
 import kotlin.math.abs
 
-interface Triangle {
+interface ITriangle: IPolygon {
     val p0: IPoint
     val p1: IPoint
     val p2: IPoint
 
-    data class Base(override val p0: IPoint, override val p1: IPoint, override val p2: IPoint) : Triangle,
-        GeometricFigure2D {
-        override val points: IPointArrayList =
-            PointArrayList(3).apply { add(p0).add(p1).add(p2) }
-        override val closed: Boolean = true
+    override val area: Double get() = Triangle.area(p0, p1, p2)
+
+    fun point(index: Int) = when (index) {
+        0 -> p0
+        1 -> p1
+        2 -> p2
+        else -> error("Invalid triangle point index $index")
     }
+
+    /**
+     * Test if this Triangle contains the Point2d object given as parameter as its vertices.
+     *
+     * @return <code>True</code> if the Point2d objects are of the Triangle's vertices,
+     *         <code>false</code> otherwise.
+     */
+    fun containsPoint(point: IPoint): Boolean = (point == p0) || (point == p1) || (point == p2)
+
+    /**
+     * Test if this Triangle contains the Edge object given as parameters as its bounding edges.
+     * @return <code>True</code> if the Edge objects are of the Triangle's bounding
+     *         edges, <code>false</code> otherwise.
+     */
+// In a triangle to check if contains and edge is enough to check if it contains the two vertices.
+    fun containsEdge(edge: Edge): Boolean = containsEdgePoints(edge.p, edge.q)
+
+    // In a triangle to check if contains and edge is enough to check if it contains the two vertices.
+    fun containsEdgePoints(p1: IPoint, p2: IPoint): Boolean = containsPoint(p1) && containsPoint(p2)
+
+    private fun _product(p1: IPoint, p2: IPoint, p3: IPoint): Double = (p1.x - p3.x) * (p2.y - p3.y) - (p1.y - p3.y) * (p2.x - p3.x)
+
+    fun pointInsideTriangle(pp: IPoint): Boolean {
+        val sign0 = _product(p0, p1, p2)
+        val sign1 = _product(p0, p1, pp)
+        val sign2 = _product(p1, p2, pp)
+        val sign3 = _product(p2, p0, pp)
+        return if (sign0 >= 0) (sign1 >= 0) && (sign2 >= 0) && (sign3 >= 0) else (sign1 <= 0) && (sign2 <= 0) && (sign3 <= 0)
+    }
+
+    // Optimized?
+    fun getPointIndexOffsetNoThrow(p: IPoint, offset: Int = 0, notFound: Int = Int.MIN_VALUE): Int {
+        var no: Int = offset
+        for (n in 0 until 3) {
+            while (no < 0) no += 3
+            while (no > 2) no -= 3
+            if (p == (this.point(n))) return no
+            no++
+        }
+        return notFound
+    }
+
+    fun getPointIndexOffset(p: IPoint, offset: Int = 0): Int {
+        val v = getPointIndexOffsetNoThrow(p, offset, Int.MIN_VALUE)
+        if (v == Int.MIN_VALUE) throw Error("Point2d not in triangle")
+        return v
+    }
+
+    fun pointCW(p: IPoint): IPoint = this.point(getPointIndexOffset(p, -1))
+    fun pointCCW(p: IPoint): IPoint = this.point(getPointIndexOffset(p, +1))
+    fun oppositePoint(t: Triangle, p: IPoint): IPoint = this.pointCW(t.pointCW(p))
+
+    // todo fix orientation stuff
+
+    /** Alias for getPointIndexOffset */
+    fun index(p: IPoint): Int = this.getPointIndexOffsetNoThrow(p, 0, -1)
+
+    fun edgeIndex(p1: IPoint, p2: IPoint): Int {
+        when (p1) {
+            this.point(0) -> {
+                if (p2 == this.point(1)) return 2
+                if (p2 == this.point(2)) return 1
+            }
+            this.point(1) -> {
+                if (p2 == this.point(2)) return 0
+                if (p2 == this.point(0)) return 2
+            }
+            this.point(2) -> {
+                if (p2 == this.point(0)) return 1
+                if (p2 == this.point(1)) return 0
+            }
+        }
+        return -1
+    }
+}
+
+data class Triangle private constructor(override val p0: IPoint, override val p1: IPoint, override val p2: IPoint) : ITriangle {
+    override val points: IPointArrayList =
+        PointArrayList(3).apply { add(p0).add(p1).add(p2) }
 
     companion object {
         private const val EPSILON: Double = 1e-12
@@ -107,104 +188,22 @@ interface Triangle {
 
             return true
         }
-    }
-}
 
-fun Triangle.point(index: Int) = when (index) {
-    0 -> p0
-    1 -> p1
-    2 -> p2
-    else -> error("Invalid triangle point index $index")
-}
-
-/**
- * Test if this Triangle contains the Point2d object given as parameter as its vertices.
- *
- * @return <code>True</code> if the Point2d objects are of the Triangle's vertices,
- *         <code>false</code> otherwise.
- */
-fun Triangle.containsPoint(point: IPoint): Boolean = (point == p0) || (point == p1) || (point == p2)
-
-/**
- * Test if this Triangle contains the Edge object given as parameters as its bounding edges.
- * @return <code>True</code> if the Edge objects are of the Triangle's bounding
- *         edges, <code>false</code> otherwise.
- */
-// In a triangle to check if contains and edge is enough to check if it contains the two vertices.
-fun Triangle.containsEdge(edge: Edge): Boolean = containsEdgePoints(edge.p, edge.q)
-
-// In a triangle to check if contains and edge is enough to check if it contains the two vertices.
-fun Triangle.containsEdgePoints(p1: IPoint, p2: IPoint): Boolean = containsPoint(p1) && containsPoint(p2)
-
-private fun _product(p1: IPoint, p2: IPoint, p3: IPoint): Double = (p1.x - p3.x) * (p2.y - p3.y) - (p1.y - p3.y) * (p2.x - p3.x)
-
-fun Triangle.pointInsideTriangle(pp: IPoint): Boolean {
-    val sign0 = _product(p0, p1, p2)
-    val sign1 = _product(p0, p1, pp)
-    val sign2 = _product(p1, p2, pp)
-    val sign3 = _product(p2, p0, pp)
-    return if (sign0 >= 0) (sign1 >= 0) && (sign2 >= 0) && (sign3 >= 0) else (sign1 <= 0) && (sign2 <= 0) && (sign3 <= 0)
-}
-
-// Optimized?
-fun Triangle.getPointIndexOffsetNoThrow(p: IPoint, offset: Int = 0, notFound: Int = Int.MIN_VALUE): Int {
-    var no: Int = offset
-    for (n in 0 until 3) {
-        while (no < 0) no += 3
-        while (no > 2) no -= 3
-        if (p == (this.point(n))) return no
-        no++
-    }
-    return notFound
-}
-
-fun Triangle.getPointIndexOffset(p: IPoint, offset: Int = 0): Int {
-    val v = getPointIndexOffsetNoThrow(p, offset, Int.MIN_VALUE)
-    if (v == Int.MIN_VALUE) throw Error("Point2d not in triangle")
-    return v
-}
-
-fun Triangle.pointCW(p: IPoint): IPoint = this.point(getPointIndexOffset(p, -1))
-fun Triangle.pointCCW(p: IPoint): IPoint = this.point(getPointIndexOffset(p, +1))
-fun Triangle.oppositePoint(t: Triangle, p: IPoint): IPoint = this.pointCW(t.pointCW(p))
-
-// todo fix orientation stuff
-fun Triangle(p0: IPoint, p1: IPoint, p2: IPoint, fixOrientation: Boolean = false, checkOrientation: Boolean = true): Triangle.Base {
-    @Suppress("NAME_SHADOWING")
-    var p1 = p1
-    @Suppress("NAME_SHADOWING")
-    var p2 = p2
-    if (fixOrientation) {
-        if (Orientation.orient2d(p0, p1, p2) == Orientation.CLOCK_WISE) {
-            val pt = p2
-            p2 = p1
-            p1 = pt
-            //println("Fixed orientation");
+        operator fun invoke(p0: IPoint, p1: IPoint, p2: IPoint, fixOrientation: Boolean = false, checkOrientation: Boolean = true): Triangle {
+            @Suppress("NAME_SHADOWING")
+            var p1 = p1
+            @Suppress("NAME_SHADOWING")
+            var p2 = p2
+            if (fixOrientation) {
+                if (Orientation.orient2d(p0, p1, p2) == Orientation.CLOCK_WISE) {
+                    val pt = p2
+                    p2 = p1
+                    p1 = pt
+                    //println("Fixed orientation");
+                }
+            }
+            if (checkOrientation && Orientation.orient2d(p2, p1, p0) != Orientation.CLOCK_WISE) throw(Error("Triangle must defined with Orientation.CW"))
+            return Triangle(p0, p1, p2)
         }
     }
-    if (checkOrientation && Orientation.orient2d(p2, p1, p0) != Orientation.CLOCK_WISE) throw(Error("Triangle must defined with Orientation.CW"))
-    return Triangle.Base(p0, p1, p2)
-}
-
-val Triangle.area: Double get() = Triangle.area(p0, p1, p2)
-
-/** Alias for getPointIndexOffset */
-fun Triangle.index(p: IPoint): Int = this.getPointIndexOffsetNoThrow(p, 0, -1)
-
-fun Triangle.edgeIndex(p1: IPoint, p2: IPoint): Int {
-    when (p1) {
-        this.point(0) -> {
-            if (p2 == this.point(1)) return 2
-            if (p2 == this.point(2)) return 1
-        }
-        this.point(1) -> {
-            if (p2 == this.point(2)) return 0
-            if (p2 == this.point(0)) return 2
-        }
-        this.point(2) -> {
-            if (p2 == this.point(0)) return 1
-            if (p2 == this.point(1)) return 0
-        }
-    }
-    return -1
 }

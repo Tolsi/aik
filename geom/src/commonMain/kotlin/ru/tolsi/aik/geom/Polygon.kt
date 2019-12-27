@@ -2,12 +2,18 @@ package ru.tolsi.aik.geom
 
 import kotlin.math.abs
 
-data class Polygon(override val points: IPointArrayList) : GeometricFigure2D, WithArea {
-    override val closed: Boolean = true
-    val closedPoints by lazy {
-        this.points.plus(this.points.first())
+interface IPolygon: GeometricFigure2D, WithArea {
+    override val closed: Boolean get() = true
+
+    // todo optimize it later?
+    fun closedPoints(): List<Point> {
+        return this.points.plus(this.points.first())
     }
 
+    fun edges(): List<Line> { return closedPoints().windowed(2).map { it.toLine() } }
+}
+
+data class Polygon(override val points: IPointArrayList) : IPolygon {
     override fun containsPoint(x: Double, y: Double): Boolean = this.points.contains(x, y)
     override val area: Double
         get() {
@@ -28,7 +34,7 @@ data class Polygon(override val points: IPointArrayList) : GeometricFigure2D, Wi
 
 fun Polygon.simplify(): Polygon {
     val result =
-        closedPoints.windowed(2).fold(null as Direction? to listOf<Point>()) { (lastDirection, points), (f, s) ->
+        edges().fold(null as Direction? to listOf<Point>()) { (lastDirection, points), (f, s) ->
             val newDirection = f.directionsTo(s).first()
             val newPoints = if (lastDirection == null || lastDirection != newDirection) {
                 points.plus(f)
@@ -46,8 +52,8 @@ fun List<IPoint>.toPolygon(): Polygon {
 
 // https://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm
 fun Polygon.intersection(clipper: Line): List<Point> {
-    return this.closedPoints.windowed(2)
-        .mapNotNull { Line(it.get(0), it.get(1)).intersects(clipper) }
+    return this.edges()
+        .mapNotNull { it.intersects(clipper) }
 }
 
 // Implements Sutherland–Hodgman algorithm
@@ -129,16 +135,16 @@ private fun clip(polygon: Polygon, p1: Point, p2: Point): Polygon {
 fun Rectangle.toPolygon(): Polygon = this.points.toPolygon()
 
 fun Polygon.edgeIntersections(clipper: Line): Sequence<Point> {
-    return this.closedPoints.windowed(2).asSequence()
-        .mapNotNull { Line(it.get(0), it.get(1)).intersects(clipper) }
+    return this.edges().asSequence()
+        .mapNotNull { it.intersects(clipper) }
 }
 
 fun Polygon.lineView(clipper: Line): Line? {
     val linesInsidePoly = clipper.points().filter { isPointInside(it) }
     return when (linesInsidePoly.size) {
         1 -> {
-            val edgeIntersection = this.closedPoints.windowed(2).asSequence()
-                .mapNotNull { Line(it.get(0), it.get(1)).intersects(clipper) }
+            val edgeIntersection = this.edges().asSequence()
+                .mapNotNull { it.intersects(clipper) }
             edgeIntersection.firstOrNull()?.let { Line(linesInsidePoly.first(), it) }
         }
         2 -> clipper
@@ -147,8 +153,8 @@ fun Polygon.lineView(clipper: Line): Line? {
 }
 
 fun Polygon.isPointInside(point: Point): Boolean {
-    return this.closedPoints.windowed(2).asSequence()
-        .any { Line(it.get(0), it.get(1)).intersectsAsLine(point) } && edgeIntersections(
+    return this.edges().asSequence()
+        .any { it.intersectsAsLine(point) } && edgeIntersections(
         Line(
             point,
             point.right

@@ -6,7 +6,7 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.round
 
-interface IRectangle : GeometricFigure2D, WithArea, Sizeable {
+interface IRectangle : IPolygon, Sizeable {
     val x: Double
     val y: Double
     val width: Double

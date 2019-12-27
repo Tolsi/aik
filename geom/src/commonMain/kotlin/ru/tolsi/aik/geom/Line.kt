@@ -9,6 +9,10 @@ interface ILine: GeometricFigure2D {
     fun intersects(p: Point): Boolean
     fun intersects(l: ILine): Point?
 
+    fun isBound(p: IPoint): Boolean {
+        return (line.from == point) || (line.to == point)
+    }
+
     val length: Double
         get() = from.distanceTo(to)
 
@@ -136,6 +140,10 @@ interface ILine: GeometricFigure2D {
     fun moveTo(point: Point): Line {
         val normalized = this.toLenghtOneLine().normalize()
         return Line(point, point.plus(normalized.to).mutable)
+    }
+
+    fun toPair(): Pair<Point, Point> {
+        return this.from to this.to
     }
 }
 
