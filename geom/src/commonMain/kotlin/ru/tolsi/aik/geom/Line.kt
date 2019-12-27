@@ -2,7 +2,7 @@ package ru.tolsi.aik.geom
 
 import kotlin.math.*
 
-interface ILine: GeometricFigure2D {
+interface ILine: Figure2D {
     val from: Point
     val to: Point
 

@@ -4,7 +4,7 @@ interface WithArea {
     val area: Double
 }
 
-interface GeometricFigure2D {
+interface Figure2D {
     val points: IPointArrayList
     val closed: Boolean
     fun containsPoint(x: Double, y: Double): Boolean = false
@@ -13,7 +13,7 @@ interface GeometricFigure2D {
 
 val List<IPointArrayList>.totalVertices get() = this.map { it.size }.sum()
 
-fun IPointArrayList.toGeometricFigure2D(closed: Boolean = true): GeometricFigure2D {
+fun IPointArrayList.toFigure2D(closed: Boolean = true): Figure2D {
     if (closed && this.size == 4) {
         val x0 = this.getX(0)
         val y0 = this.getY(0)
@@ -26,13 +26,13 @@ fun IPointArrayList.toGeometricFigure2D(closed: Boolean = true): GeometricFigure
     return if (closed) Polygon(this) else Polyline(this)
 }
 
-fun GeometricFigure2D.getAllPoints(out: PointArrayList = PointArrayList()): PointArrayList =
+fun Figure2D.getAllPoints(out: PointArrayList = PointArrayList()): PointArrayList =
     out.apply { for (path in this@getAllPoints.points) add(path) }
 
-fun GeometricFigure2D.toPolygon(): Polygon = if (this is Polygon) this else Polygon(this.getAllPoints())
+fun Figure2D.toPolygon(): Polygon = if (this is Polygon) this else Polygon(this.getAllPoints())
 
 // todo for drop same by EPS points
-fun GeometricFigure2D.merge(figure: GeometricFigure2D): Polygon? {
+fun Figure2D.merge(figure: Figure2D): Polygon? {
     val allPoints = this.points.plus(figure.points)
     val uniquePoints = allPoints.distinct()
     val canBeMerged = uniquePoints.size <= allPoints.size - 2

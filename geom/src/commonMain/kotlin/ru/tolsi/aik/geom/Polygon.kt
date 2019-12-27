@@ -2,7 +2,7 @@ package ru.tolsi.aik.geom
 
 import kotlin.math.abs
 
-interface IPolygon: GeometricFigure2D, WithArea {
+interface IPolygon: Figure2D, WithArea {
     override val closed: Boolean get() = true
 
     // todo optimize it later?
