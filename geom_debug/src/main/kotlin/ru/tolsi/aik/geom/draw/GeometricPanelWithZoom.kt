@@ -2,11 +2,9 @@ package ru.tolsi.aik.geom.draw
 
 import ru.tolsi.aik.geom.Figure2D
 import ru.tolsi.aik.geom.Rectangle
+import ru.tolsi.aik.geom.bottom
 import ru.tolsi.aik.geom.debug.Color
-import java.awt.Dimension
-import java.awt.Graphics
-import java.awt.Graphics2D
-import java.awt.Image
+import java.awt.*
 import javax.swing.JPanel
 
 class GeometricPanelWithZoom(val figures: List<Figure2D>) : JPanel() {
@@ -22,7 +20,7 @@ class GeometricPanelWithZoom(val figures: List<Figure2D>) : JPanel() {
         background = Color.LightGray.toAWT()
     }
 
-    private val draw = AWTDebugDrawer(Rectangle(10, 10, 100, 100), this)
+    private val draw = AWTDebugDrawer(Rectangle(0, 0, 100, 100), this)
 
     private fun resetBuffer() { // always keep track of the image size
         val bufferWidth = getPreferredSize().width
@@ -36,7 +34,6 @@ class GeometricPanelWithZoom(val figures: List<Figure2D>) : JPanel() {
             bufferImage!!.flush()
             bufferImage = null
         }
-        System.gc()
         //    create the new image with the size of the panel
         bufferImage = createImage(bufferWidth, bufferHeight)
         bufferGraphics = bufferImage!!.graphics

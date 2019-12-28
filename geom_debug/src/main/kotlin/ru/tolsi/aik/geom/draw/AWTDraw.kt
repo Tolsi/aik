@@ -5,7 +5,6 @@ import ru.tolsi.aik.geom.debug.Color
 import ru.tolsi.aik.geom.debug.DebugDrawer
 import java.awt.BasicStroke
 import java.awt.Graphics2D
-import kotlin.math.min
 
 @ExperimentalUnsignedTypes
 fun Color.toAWT(): java.awt.Color {
@@ -14,7 +13,20 @@ fun Color.toAWT(): java.awt.Color {
 
 class AWTDebugDrawer(val size: Rectangle, val panel: GeometricPanelWithZoom) : DebugDrawer {
     lateinit var graphics: Graphics2D
-    private val multiply = 5
+    val multiply = 5
+    val topPadding = 3
+    val leftPadding = 5
+
+    fun fieldXCoordinate(x: Double): Int {
+        return zoom(x * multiply + size.left + leftPadding)
+    }
+
+    private val maxY = size.height.toInt() / multiply
+
+    fun fieldYCoordinate(y: Double): Int {
+        return zoom((maxY -  y) * multiply + size.top + topPadding)
+    }
+
     private fun draw(f: Figure2D, depth: Float, c: Color, first: Boolean) {
         if (first) {
             drawField(graphics)
@@ -25,17 +37,17 @@ class AWTDebugDrawer(val size: Rectangle, val panel: GeometricPanelWithZoom) : D
             is ILine -> {
                 f.edges().forEach {
                     graphics.drawLine(
-                        zoom(it.from.x * multiply + size.left),
-                        zoom(it.from.y * multiply + size.top),
-                        zoom(it.to.x * multiply + size.left),
-                        zoom(it.to.y * multiply + size.top)
+                        fieldXCoordinate(it.from.x),
+                        fieldYCoordinate(it.from.y),
+                        fieldXCoordinate(it.to.x),
+                        fieldYCoordinate(it.to.y)
                     )
                 }
                 f.points.forEach {
                     val r = it.toRectangleWithCenterInPoint(0.1)
                     graphics.drawRect(
-                        zoom(r.x * multiply + size.left),
-                        zoom(r.y * multiply + size.top),
+                        fieldXCoordinate(r.x),
+                        fieldYCoordinate(r.y + r.height),
                         zoom(r.width * multiply),
                         zoom(r.height * multiply)
                     )
@@ -54,10 +66,11 @@ class AWTDebugDrawer(val size: Rectangle, val panel: GeometricPanelWithZoom) : D
 
     override fun clear() {
         graphics.color = Color.DarkGray.toAWT()
-        graphics.fillRect(0, 0, zoom(size.right + 5), zoom(size.bottom + 5))
+        // todo draw until size-10?
+        graphics.fillRect(0, 0, zoom(size.right + 10), zoom(size.bottom + 10))
     }
 
-    private fun zoom(value: Number): Int {
+    fun zoom(value: Number): Int {
         return (value.toDouble() * panel.scale).toInt()
     }
 
@@ -66,15 +79,18 @@ class AWTDebugDrawer(val size: Rectangle, val panel: GeometricPanelWithZoom) : D
         g.stroke = BasicStroke(0.2f)
         g.font = g.font.deriveFont(zoom(3f))
 
-        val startFromX = size.x.toInt()
-        val startFromY = size.y.toInt()
+        val leftX = size.x.toInt() + leftPadding
+        val bottomY = size.bottom.toInt() + topPadding
 
-        (0..min(size.height, size.width).toInt() step multiply).forEach { i ->
-            g.drawLine(zoom(startFromX + i), zoom(startFromY), zoom(startFromX + i), zoom(startFromY + 100))
-            g.drawLine(zoom(startFromX), zoom(startFromY + i), zoom(startFromX + 100), zoom(startFromY + i))
-
-            g.drawString("${(i / 5)}", zoom(startFromX + (i - 0.5).toFloat()), zoom(startFromY - 3f))
-            g.drawString("${(i / 5)}", zoom(startFromX - 5f), zoom(startFromY + (i + 0.7).toFloat()))
+        // y
+        (0..size.height.toInt() step multiply).forEach { i ->
+            g.drawLine(zoom(leftX), zoom(bottomY - i), zoom(leftX + 100), zoom(bottomY - i))
+            g.drawString("${(i / 5)}", zoom(leftX - 5f), zoom(bottomY - i + 0.7))
+        }
+        // x
+        (0..size.width.toInt() step multiply).forEach { i ->
+            g.drawLine(zoom(leftX + i), zoom(bottomY), zoom(leftX + i), zoom(bottomY - 100))
+            g.drawString("${(i / 5)}", zoom(leftX + i - 0.5), zoom(bottomY + 3f))
         }
     }
 
