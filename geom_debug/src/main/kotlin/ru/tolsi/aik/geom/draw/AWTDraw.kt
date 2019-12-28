@@ -12,7 +12,7 @@ fun Color.toAWT(): java.awt.Color {
     return java.awt.Color(this.r.toInt(), this.g.toInt(), this.b.toInt(), this.alpha.toInt())
 }
 
-class AWTDebugDrawer(val size: Rectangle, val panel: ZoomablePanel) : DebugDrawer {
+class AWTDebugDrawer(val size: Rectangle, val panel: GeometricPanelWithZoom) : DebugDrawer {
     lateinit var graphics: Graphics2D
     private val multiply = 5
     private fun draw(f: Figure2D, depth: Float, c: Color, first: Boolean) {
@@ -33,7 +33,7 @@ class AWTDebugDrawer(val size: Rectangle, val panel: ZoomablePanel) : DebugDrawe
                 }
                 f.points.forEach {
                     val r = it.toRectangleWithCenterInPoint(0.1)
-                    graphics.fillRect(
+                    graphics.drawRect(
                         zoom(r.x * multiply + size.left),
                         zoom(r.y * multiply + size.top),
                         zoom(r.width * multiply),
