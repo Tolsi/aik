@@ -4,13 +4,6 @@ import kotlin.math.abs
 
 interface IPolygon: Figure2D, WithArea {
     override val closed: Boolean get() = true
-
-    // todo optimize it later?
-    fun closedPoints(): List<Point> {
-        return this.points.plus(this.points.first())
-    }
-
-    fun edges(): List<Line> { return closedPoints().windowed(2).map { it.toLine() } }
 }
 
 open class Polygon(override val points: IPointArrayList) : IPolygon {
@@ -32,7 +25,7 @@ open class Polygon(override val points: IPointArrayList) : IPolygon {
         }
 }
 
-fun Polygon.simplify(): Polygon {
+fun IPolygon.simplify(): IPolygon {
     val result =
         edges().fold(null as Direction? to emptyList<IPoint>()) { (lastDirection, points), line ->
             val newDirection = line.from.directionsTo(line.to).first()
@@ -46,18 +39,18 @@ fun Polygon.simplify(): Polygon {
     return Polygon(PointArrayList(result))
 }
 
-fun List<IPoint>.toPolygon(): Polygon {
+fun List<IPoint>.toPolygon(): IPolygon {
     return Polygon(PointArrayList(this))
 }
 
 // https://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm
-fun Polygon.intersection(clipper: Line): List<IPoint> {
+fun IPolygon.intersection(clipper: Line): List<IPoint> {
     return this.edges()
         .mapNotNull { it.intersects(clipper) }
 }
 
 // Implements Sutherland–Hodgman algorithm
-fun Polygon.clip(clipper: Polygon): Polygon {
+fun IPolygon.clip(clipper: IPolygon): IPolygon {
 //    require(this.closed && clipper.closed)
     // todo what if it is inside of clipper?
 //    if (this.getAllPoints().all { clipper.containsPoint(it.x, it.y) }) {
@@ -77,7 +70,7 @@ fun Polygon.clip(clipper: Polygon): Polygon {
 // https://www.geeksforgeeks.org/polygon-clipping-sutherland-hodgman-algorithm-please-change-bmp-images-jpeg-png/
 // This functions clips all the edges w.r.t one clip
 // edge of clipping area
-private fun clip(polygon: Polygon, p1: IPoint, p2: IPoint): Polygon {
+private fun clip(polygon: IPolygon, p1: IPoint, p2: IPoint): IPolygon {
     val newPolygonPoints = mutableSetOf<IPoint>()
     val x1 = p1.x
     val y1 = p1.y
@@ -132,14 +125,14 @@ private fun clip(polygon: Polygon, p1: IPoint, p2: IPoint): Polygon {
     return Polygon(PointArrayList(newPolygonPoints.toList()))
 }
 
-fun Rectangle.toPolygon(): Polygon = this.points.toPolygon()
+fun Rectangle.toPolygon(): IPolygon = this.points.toPolygon()
 
-fun Polygon.edgeIntersections(clipper: Line): Sequence<IPoint> {
+fun IPolygon.edgeIntersections(clipper: Line): Sequence<IPoint> {
     return this.edges().asSequence()
         .mapNotNull { it.intersects(clipper) }
 }
 
-fun Polygon.lineView(clipper: Line): Line? {
+fun IPolygon.lineIntersection(clipper: Line): Line? {
     val linesInsidePoly = clipper.points().filter { isPointInside(it) }
     return when (linesInsidePoly.size) {
         1 -> {
@@ -152,7 +145,7 @@ fun Polygon.lineView(clipper: Line): Line? {
     }
 }
 
-fun Polygon.isPointInside(point: IPoint): Boolean {
+fun IPolygon.isPointInside(point: IPoint): Boolean {
     return this.edges().asSequence()
         .any { it.intersectsAsLine(point) } && edgeIntersections(
         Line(

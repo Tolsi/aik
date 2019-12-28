@@ -8,9 +8,11 @@ import kotlin.math.acos
 import kotlin.math.hypot
 import kotlin.math.roundToInt
 
-interface IPoint {
+interface IPoint: Comparable<IPoint> {
     val x: Double
     val y: Double
+
+    override fun compareTo(other: IPoint): Int = Point.compareEps(this.x, this.y, other.x, other.y)
 
     companion object {
         operator fun invoke(): IPoint = Point(0.0, 0.0)
@@ -18,8 +20,7 @@ interface IPoint {
     }
 }
 
-data class Point(override var x: Double, override var y: Double) : Comparable<IPoint>, IPoint {
-    override fun compareTo(other: IPoint): Int = compareEps(this.x, this.y, other.x, other.y)
+data class Point(override var x: Double, override var y: Double): IPoint {
 
     companion object {
         val Zero: IPoint = Point(0.0, 0.0)
@@ -259,7 +260,7 @@ fun IPoint.toZeroAngleLine(): Line {
     return Line(this, this.right)
 }
 
-fun List<Point>.epsUnique(): List<Point> {
+fun List<IPoint>.epsUnique(): List<IPoint> {
     return this.fold(listOf()) { res, p ->
         if (!res.any { it.compareTo(p) == 0 }) {
             res.plus(p)
@@ -267,7 +268,7 @@ fun List<Point>.epsUnique(): List<Point> {
     }
 }
 
-fun List<Point>.epsRemove(remove: Point): List<Point> {
+fun List<IPoint>.epsRemove(remove: IPoint): List<IPoint> {
     return this.fold(mutableListOf()) { res, p ->
         if (p.compareTo(remove) != 0) {
             res.add(p)
@@ -278,7 +279,7 @@ fun List<Point>.epsRemove(remove: Point): List<Point> {
     }
 }
 
-fun List<Point>.epsRemove(remove: List<Point>): List<Point> {
+fun List<IPoint>.epsRemove(remove: List<IPoint>): List<IPoint> {
     return this.fold(mutableListOf()) { res, p ->
         if (remove.all { p.compareTo(it) != 0 }) {
             res.add(p)
@@ -289,10 +290,10 @@ fun List<Point>.epsRemove(remove: List<Point>): List<Point> {
     }
 }
 
-fun List<Point>.epsContains(p: Point): Boolean {
+fun List<IPoint>.epsContains(p: IPoint): Boolean {
     return this.any { it.compareTo(p) == 0 }
 }
 
-fun IPoint.toRectangleWithCenterInPoint(radius: Double): Rectangle {
+fun IPoint.toRectangleWithCenterInPoint(radius: Double): IRectangle {
     return Rectangle(this.x - radius, this.y - radius, radius * 2, radius * 2)
 }

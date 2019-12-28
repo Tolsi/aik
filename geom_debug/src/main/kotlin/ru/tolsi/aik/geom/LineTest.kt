@@ -1,8 +1,6 @@
 package ru.tolsi.aik.geom
 
-import ru.tolsi.aik.geom.shape.Shape2d
-import ru.tolsi.aik.geom.shape.clip
-import ru.tolsi.aik.geom.triangle.Triangle
+import ru.tolsi.aik.geom.Line
 import kotlin.jvm.JvmStatic
 
 object LineTest {
@@ -19,7 +17,7 @@ object LineTest {
             Point(100, 150),
             Point(200, 250),
             Point(300, 200), false, false)
-        val rec = Shape2d.Line(100, 100, 200, 200)
+        val rec = Line(100, 100, 200, 200)
 //        println(rec.clip(tri))
     }
 }

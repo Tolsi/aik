@@ -29,4 +29,5 @@ dependencies {
     // implementation "org.locationtech.jts:jts-core:1.16.1"
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile project(":geom")
+    compile project(":ai")
 }

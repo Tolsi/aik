@@ -7,6 +7,14 @@ interface WithArea {
 interface Figure2D {
     val points: IPointArrayList
     val closed: Boolean
+
+    fun edges(): List<Line> { return closedPoints().windowed(2).map { it.toLine() } }
+
+    // todo optimize it later?
+    fun closedPoints(): List<Point> {
+        return this.points.plus(this.points.first())
+    }
+
     fun containsPoint(x: Double, y: Double): Boolean = false
     fun containsPoint(p: Point): Boolean = containsPoint(p.x, p.y)
 }
@@ -29,10 +37,10 @@ fun IPointArrayList.toFigure2D(closed: Boolean = true): Figure2D {
 fun Figure2D.getAllPoints(out: PointArrayList = PointArrayList()): PointArrayList =
     out.apply { for (path in this@getAllPoints.points) add(path) }
 
-fun Figure2D.toPolygon(): Polygon = if (this is Polygon) this else Polygon(this.getAllPoints())
+fun Figure2D.toPolygon(): IPolygon = if (this is Polygon) this else Polygon(this.getAllPoints())
 
 // todo for drop same by EPS points
-fun Figure2D.merge(figure: Figure2D): Polygon? {
+fun Figure2D.merge(figure: Figure2D): IPolygon? {
     val allPoints = this.points.plus(figure.points)
     val uniquePoints = allPoints.distinct()
     val canBeMerged = uniquePoints.size <= allPoints.size - 2
