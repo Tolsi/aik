@@ -5,15 +5,13 @@ import com.soywiz.kds.Stack
 import ru.tolsi.aik.geom.*
 
 // recommended
-fun Collection<IPoint>.twoWaysBfsTravellingSalesmanProblem(): List<IPoint>? {
+fun Collection<IPoint>.twoWaysBfsTravellingSalesmanProblem(startAndPreEndPoint: Point): List<IPoint>? {
 
     if (this.size % 2 != 0) return null
     // dfs
     // val allowedPaths = Stack<Pair<List<Point>, List<Point>>>()
     // bfs
     val allowedPaths = Queue<Pair<List<IPoint>, List<IPoint>>>()
-    val sortedPoints = this.groupBy { it.x }.flatMap { it.value.sortedBy { it.y } }
-    val startAndPreEndPoint = sortedPoints.first()
     allowedPaths.enqueue(listOf(startAndPreEndPoint) to listOf())
     do {
         val (leftPath, rightPath) = allowedPaths.dequeue()
@@ -72,6 +70,8 @@ fun Collection<IPoint>.dfsTravellingSalesmanProblem(): List<IPoint>? {
     return null
 }
 
-fun Polygon.travellingSalesmanProblem(): Polygon {
-    return this.points.twoWaysBfsTravellingSalesmanProblem()!!.toPolygon()
+fun IPolygon.travellingSalesmanProblem(): IPolygon {
+    val sortedPoints = this.points.groupBy { it.x }.flatMap { it.value.sortedBy { it.y } }
+    val startAndPreEndPoint = sortedPoints.first()
+    return this.points.twoWaysBfsTravellingSalesmanProblem(startAndPreEndPoint)!!.toPolygon()
 }

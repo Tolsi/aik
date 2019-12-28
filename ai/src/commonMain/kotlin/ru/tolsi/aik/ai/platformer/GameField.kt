@@ -13,8 +13,8 @@ abstract class Game {}
 class GameField<T : Tile>(val tiles: Array2<Tile>) :
     Rectangle(0.0, 0.0, tiles.height.toDouble(), tiles.width.toDouble()) {
 
-    fun tilesToPolygons(tileType: T): List<Polygon> {
-        val result = mutableSetOf<Polygon>()
+    fun tilesToPolygons(tileType: T): List<IPolygon> {
+        val result = mutableSetOf<IPolygon>()
 
         this.tiles.getPositionsWithValue(tileType).forEach { (x, y) ->
             if (x != 0 &&
