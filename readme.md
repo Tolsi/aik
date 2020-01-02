@@ -18,6 +18,8 @@ For some operations, objects with integer points will be declared.
 
 # Planned [geometric shapes](https://en.wikipedia.org/wiki/Geometric_shape) and geometric operations
 
+☐ - TODO, [T] - need testing, ☑ - done
+
 I chose the geometric shapes that I used and the most popular in my opinion from the [wiki list](https://en.wikipedia.org/wiki/List_of_two-dimensional_geometric_shapes).
 
 [T] [Point](https://en.wikipedia.org/wiki/Point_(geometry)). Also it is Vector1D
