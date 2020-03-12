@@ -53,6 +53,30 @@ class GeometricPanelWithZoom(val figures: List<Figure2D>) : JPanel() {
         super.paintComponent(g)
         if (bufferImage == null) resetBuffer()
         g.drawImage(bufferImage, 0, 0, this)
+
+        // todo draw numbers close to all lines and screen sizes
+        g as Graphics2D
+
+        g.color = Color.White.copy(alpha = 30u).toAWT()
+        g.stroke = BasicStroke(0.2f)
+        g.font = g.font.deriveFont(draw.zoom(3f))
+
+        val startFromX = visibleRect.x + 1
+        val startFromY = visibleRect.toRectangle().bottom.toInt() + 1
+
+        // y
+        ((visibleRect.x / draw.multiply)..((visibleRect.width + visibleRect.x) / draw.multiply)).filter { it % draw.multiply == 0 }
+            .forEach { i ->
+                g.drawString("${(i / 5)}", startFromX, startFromY - draw.zoom(i))
+            }
+
+        // x
+        ((visibleRect.y / draw.multiply)..((visibleRect.height +
+                visibleRect.y) / draw.multiply)).filter { it % draw.multiply == 0 }
+            .forEach { i ->
+                g.drawString("${(i / 5)}", startFromX + draw.zoom(i), startFromY)
+            }
+
     }
 
     /**
