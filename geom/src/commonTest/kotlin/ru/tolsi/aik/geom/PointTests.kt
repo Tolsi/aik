@@ -193,5 +193,23 @@ class PointTests {
         assertEquals(0, Point.steps(Point(1, 1), Point(1, 1)))
     }
 
+    @Test
+    fun stepsWithDiagonalsTest() {
+        assertEquals(100, Point.stepsWithDiagonals(Point(0, 0), Point(100.0, 100.0)))
+    }
 
+    @Test
+    fun stepsWithDiagonalsTest2() {
+        assertEquals(1, Point.stepsWithDiagonals(Point(0, 0), Point(0, 1)))
+    }
+
+    @Test
+    fun stepsWithDiagonalsTest3() {
+        assertEquals(1, Point.stepsWithDiagonals(Point(0, 0), Point(1, 1)))
+    }
+
+    @Test
+    fun stepsWithDiagonalsTest4() {
+        assertEquals(0, Point.stepsWithDiagonals(Point(1, 1), Point(1, 1)))
+    }
 }

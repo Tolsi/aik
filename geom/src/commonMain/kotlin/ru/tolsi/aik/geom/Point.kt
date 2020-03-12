@@ -6,6 +6,7 @@ import ru.tolsi.aik.geom.internal.niceStr
 import kotlin.math.abs
 import kotlin.math.acos
 import kotlin.math.hypot
+import kotlin.math.max
 import kotlin.math.roundToInt
 
 interface IPoint: Comparable<IPoint> {
@@ -40,9 +41,10 @@ data class Point(override var x: Double, override var y: Double): IPoint {
 
         fun middle(a: IPoint, b: IPoint): Point = Point((a.x + b.x) * 0.5, (a.y + b.y) * 0.5)
 
-        fun angle(a: IPoint, b: IPoint): Angle = Angle.fromRadians(acos((a.dot(b)) / (a.length * b.length)))
+        fun angleBetweenVectors(a: IPoint, b: IPoint): Angle =
+            Angle.fromRadians(acos((a.dot(b)) / (a.length * b.length)))
 
-        fun angle(ax: Double, ay: Double, bx: Double, by: Double): Angle = Angle.between(ax, ay, bx, by)
+        fun angleBetweenPoints(ax: Double, ay: Double, bx: Double, by: Double): Angle = Angle.between(ax, ay, bx, by)
         //acos(((ax * bx) + (ay * by)) / (hypot(ax, ay) * hypot(bx, by)))
 
         fun compare(lx: Double, ly: Double, rx: Double, ry: Double): Int {
@@ -58,16 +60,19 @@ data class Point(override var x: Double, override var y: Double): IPoint {
         fun compare(l: IPoint, r: IPoint): Int = compare(l.x, l.y, r.x, r.y)
         fun compareEps(l: IPoint, r: IPoint): Int = compareEps(l.x, l.y, r.x, r.y)
 
-        fun angle(x1: Double, y1: Double, x2: Double, y2: Double, x3: Double, y3: Double): Angle = Angle.between(x1 - x2, y1 - y2, x1 - x3, y1 - y3)
+        fun angleBetweenPoints(x1: Double, y1: Double, x2: Double, y2: Double, x3: Double, y3: Double): Angle =
+            Angle.between(x1 - x2, y1 - y2, x1 - x3, y1 - y3)
 
-        fun distance(a: Double, b: Double): Double = kotlin.math.abs(a - b)
-        fun distance(x1: Double, y1: Double, x2: Double, y2: Double): Double = kotlin.math.hypot(x1 - x2, y1 - y2)
+        fun distance(a: Double, b: Double): Double = abs(a - b)
+        fun distance(x1: Double, y1: Double, x2: Double, y2: Double): Double = hypot(x1 - x2, y1 - y2)
         inline fun distance(x1: Number, y1: Number, x2: Number, y2: Number): Double = distance(x1.toDouble(), y1.toDouble(), x2.toDouble(), y2.toDouble())
 
         fun distance(a: IPoint, b: IPoint): Double = distance(a.x, a.y, b.x, b.y)
         fun distance(a: IPointInt, b: IPointInt): Double = distance(a.x, a.y, b.x, b.y)
 
         fun steps(a: IPoint, b: IPoint): Int = abs(a.x.roundToInt() - b.x.roundToInt()) + abs(a.y.roundToInt() - b.y.roundToInt())
+
+        fun stepsWithDiagonals(a: IPoint, b: IPoint): Int = max(abs(a.x.roundToInt() - b.x.roundToInt()), abs(a.y.roundToInt() - b.y.roundToInt()))
 
         //val ax = x1 - x2
         //val ay = y1 - y2
@@ -112,20 +117,25 @@ data class Point(override var x: Double, override var y: Double): IPoint {
         return this.setTo(this.x / len, this.y / len)
     }
 
-    // todo equals and hashcode with Eps
     override fun toString(): String = "(${x.niceStr}, ${y.niceStr})"
 
-//    override fun equals(other: Any?): Boolean {
-//        if (this === other) return true
-//        if (javaClass != other?.javaClass) return false
-//        return compareTo(other as Point) == 0
-//    }
-//
-//    override fun hashCode(): Int {
-//        var result = (x / Geometry.EPS).toInt().hashCode()
-//        result = 31 * result + (y / Geometry.EPS).toInt().hashCode()
-//        return result
-//    }
+}
+
+class PointEPSKey(val p: Point) {
+    override fun hashCode(): Int {
+        var result = (p.x / Geometry.EPS).toInt().hashCode()
+        result = 31 * result + (p.y / Geometry.EPS).toInt().hashCode()
+        return result
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+
+        other as PointEPSKey
+
+        return Point.compareEps(p, other.p) == 0
+    }
 }
 
 inline fun Point.mul(s: Number) = mul(s.toDouble())
