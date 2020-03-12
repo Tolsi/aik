@@ -1,13 +1,13 @@
 package ru.tolsi.aik.geom.draw
 
-import ru.tolsi.aik.geom.Figure2D
 import ru.tolsi.aik.geom.Rectangle
 import ru.tolsi.aik.geom.bottom
 import ru.tolsi.aik.geom.debug.Color
+import ru.tolsi.aik.geom.debug.DrawerBuffer
 import java.awt.*
 import javax.swing.JPanel
 
-class GeometricPanelWithZoom(val figures: List<Figure2D>) : JPanel() {
+class GeometricPanelWithZoom(val drawer: DrawerBuffer) : JPanel() {
     val imageWidth = 120
     val imageHeight = 120
     var scale: Double = 1.0
@@ -46,7 +46,7 @@ class GeometricPanelWithZoom(val figures: List<Figure2D>) : JPanel() {
     private fun paintBuffer(g: Graphics) {
         draw.graphics = g as Graphics2D
         draw.clear()
-        figures.forEach { draw.draw(it, 0.5f, Color.values.get(it.hashCode() % Color.values.size)) }
+        drawer.drawn.forEach { draw.draw(it.f, it.depth, it.c) }
     }
 
     override fun paintComponent(g: Graphics) {
