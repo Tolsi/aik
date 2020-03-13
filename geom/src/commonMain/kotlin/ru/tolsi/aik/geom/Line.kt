@@ -34,33 +34,26 @@ interface ILine: Figure2D {
     fun b(): Double = from.x - to.x
     fun c(): Double = from.x * to.y - to.x * from.y
 
-    fun isInRectangleBetweenPoints(p: IPoint): Boolean {
-        return (p.x >= min(from.x, to.x) && p.x <= max(from.x, to.x) &&
-                p.y >= min(from.y, to.y) && p.y <= max(from.y, to.y))// || isPointTooClose(p)
-    }
-
     fun intersectsAsSegment(p: IPoint): Boolean {
-        return intersectsAsLine(p) && isInRectangleBetweenPoints(p)
+        val position = classifyPointRelativeToSegment(from, to, p)
+        return position == Position.BETWEEN || position == Position.START || position == Position.END
     }
 
     fun intersectsAsRay(p: ILine): IPoint? {
-        return intersects(p)?.takeIf {
-            it.isDirectedTo(from.directionsTo(to))
+        return intersectsAsLine(p)?.takeIf {
+            intersectsAsRay(it)
         }
     }
 
     fun intersectsAsRay(p: IPoint): Boolean {
-        return intersectsAsLine(p) && p.isDirectedTo(from.directionsTo(to))
+        val position = classifyPointRelativeToSegment(from, to, p)
+        return position != Position.LEFT && position != Position.RIGHT && position != Position.BEHIND
     }
 
-    fun intersectsAsLine(p: IPoint): Boolean =
-        if (a() <= Geometry.EPS) {
-            from.y - p.y <= Geometry.EPS
-        } else if (b() <= Geometry.EPS) {
-            from.x - p.x <= Geometry.EPS
-        } else {
-            (p.x - from.x) / (to.x - from.x) - (p.y - from.y) / (to.y - from.y) <= Geometry.EPS
-        }
+    fun intersectsAsLine(p: IPoint): Boolean {
+        val position = classifyPointRelativeToSegment(from, to, p)
+        return position != Position.LEFT && position != Position.RIGHT
+    }
 
     fun intersectsAsLine(p: ILine): IPoint? {
         val d = (this.b() * p.a() - this.a() * p.b())
@@ -70,8 +63,7 @@ interface ILine: Figure2D {
     }
 
     fun intersectsAsSegment(l: ILine): IPoint? {
-        return points.find { l.intersects(it) }
-            ?: intersectsAsLine(l)?.takeIf { isInRectangleBetweenPoints(it) && l.isInRectangleBetweenPoints(it) }
+        return intersectsAsLine(l)?.takeIf { intersectsAsSegment(it) }
     }
 
     fun IPoint.isDirectedTo(lineDirections: List<Direction>): Boolean {
@@ -157,6 +149,42 @@ interface ILine: Figure2D {
     fun toLineSegment(): LineSegment {
         return LineSegment(from, to)
     }
+
+    /*
+                /  BEYOND
+               /
+      LEFT    * END
+             /
+            / BETWEEN
+           /          RIGHT
+          * START
+         /
+        / BEHIND
+     */
+    enum class Position {
+        LEFT, RIGHT, START, END, BEHIND, BEYOND, BETWEEN
+    }
+    fun classifyPointRelativeToSegment(segmentStart: IPoint, segmentEnd: IPoint, p: IPoint): Position {
+        val segmentStart2segmentEnd = segmentEnd.minus(segmentStart)
+        val segmentStart2p = p.minus(segmentStart)
+        val area = segmentStart2segmentEnd.x * segmentStart2p.y - segmentStart2p.x * segmentStart2segmentEnd.y
+
+        return if (area > Geometry.EPS) {
+            Position.LEFT
+        } else if (area < -Geometry.EPS) {
+            Position.RIGHT
+        } else if (segmentStart2p.length < Geometry.EPS) {
+            Position.START
+        } else if (p.minus(segmentEnd).length < Geometry.EPS) {
+            Position.END
+        } else if (segmentStart2segmentEnd.x * segmentStart2p.x < 0 || segmentStart2segmentEnd.y * segmentStart2p.y < 0) {
+            Position.BEHIND
+        } else if (segmentStart2segmentEnd.length < segmentStart2p.length) {
+            Position.BEYOND
+        } else {
+            Position.BETWEEN
+        }
+    }
 }
 
 open class Line(override val from: IPoint, override val to: IPoint): ILine {
@@ -165,12 +193,6 @@ open class Line(override val from: IPoint, override val to: IPoint): ILine {
         require(from != to)
     }
 
-//    private fun isPointTooClose(p: IPoint): Boolean {
-//        return (abs(p.x - from.x) <= Geometry.EPS &&
-//                abs(p.x - to.x) <= Geometry.EPS) ||
-//                (abs(p.y - from.y) <= Geometry.EPS &&
-//                        abs(p.y - to.y) <= Geometry.EPS)
-//    }
 
 
     override fun distance(p: IPoint): Double {
