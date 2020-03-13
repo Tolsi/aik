@@ -2,7 +2,7 @@ version '0.0.1'
 
 buildscript {
     ext {
-        kotlin_version = '1.3.61'
+        kotlin_version = '1.3.70'
     }
     repositories {
         mavenLocal()
@@ -28,6 +28,13 @@ dependencies {
     // may be latter
     // implementation "org.locationtech.jts:jts-core:1.16.1"
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "com.soywiz.korlibs.kds:kds:1.9.4"
     compile project(":geom")
     compile project(":ai")
+}
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 }
