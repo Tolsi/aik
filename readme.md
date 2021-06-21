@@ -1,3 +1,5 @@
+[![Jitpack](https://jitpack.io/v/Tolsi/aik.svg)](https://jitpack.io/#Tolsi/aik)
+
 # AIK
 
 AIK is yet another one AI library for multi-platform Kotlin (primarily for JVM).
