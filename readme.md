@@ -6,13 +6,13 @@ AIK is yet another one AI library for multi-platform Kotlin (primarily for JVM).
 
 ## AI
 
-It is planned that this will include the pathfinding algorithms. Work on them will begin later :)
+Grid-based pathfinding algorithms with support for different movement patterns and cost functions.
 
-☐ Path finding for an open map
+[T] Path finding for an open map (A*, Dijkstra)
 
-☐ Path finding for an partially open map
+[T] Path finding for a partially open map (A* with obstacles)
 
-☐ Path finding for a limited range of movements
+[T] Path finding for a limited range of movements (A* with max range, reachable cells calculation)
 
 ## Geometry
 
