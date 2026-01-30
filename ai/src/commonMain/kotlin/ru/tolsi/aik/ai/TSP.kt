@@ -1,7 +1,7 @@
 package ru.tolsi.aik.ai
 
-import com.soywiz.kds.Queue
-import com.soywiz.kds.Stack
+import korlibs.datastructure.Queue
+import korlibs.datastructure.Stack
 import ru.tolsi.aik.geom.*
 
 // recommended

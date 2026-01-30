@@ -1,6 +1,6 @@
 package ru.tolsi.aik.ai.platformer
 
-import com.soywiz.kds.Array2
+import korlibs.datastructure.Array2
 import ru.tolsi.aik.ai.travellingSalesmanProblem
 import ru.tolsi.aik.geom.*
 

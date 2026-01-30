@@ -1,7 +1,7 @@
 package ru.tolsi.aik.geom
 
-import com.soywiz.kds.DoubleArrayList
-import com.soywiz.kds.IntArrayList
+import korlibs.datastructure.DoubleArrayList
+import korlibs.datastructure.IntArrayList
 import kotlin.math.round
 
 interface IPointArrayList: List<Point> {

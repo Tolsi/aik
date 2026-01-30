@@ -1,18 +1,14 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     ext {
-        kotlin_version = '1.4.31'
+        kotlin_version = '2.3.0'
     }
     repositories {
         mavenLocal()
         mavenCentral()
-        jcenter()
         google()
         maven {
-            url "https://plugins.gradle.org/m2/"
-        }
-        maven {
-            url "https://dl.bintray.com/kotlin/kotlin-dev"
+            url = "https://plugins.gradle.org/m2/"
         }
     }
 
@@ -23,36 +19,33 @@ buildscript {
 
 
 allprojects {
-    group 'ru.tolsi.aik'
+    group = 'ru.tolsi.aik'
 
     repositories {
         mavenCentral()
-        jcenter()
         google()
-        maven { url "https://dl.bintray.com/korlibs/korlibs" }
-        maven { url 'https://jitpack.io' }
+        maven { url = 'https://jitpack.io' }
     }
 }
 
 subprojects {
-    apply plugin: 'java'
     apply plugin: 'maven-publish'
 
-    sourceCompatibility = 1.8 // java 8
-    targetCompatibility = 1.8
+    // Configure Java plugin if applied
+    plugins.withId('java') {
+        java {
+            sourceCompatibility = JavaVersion.VERSION_21
+            targetCompatibility = JavaVersion.VERSION_21
+        }
 
-    task sourcesJar(type: Jar, dependsOn: classes) {
-        classifier = 'sources'
-        from sourceSets.main.allSource
-    }
+        task sourcesJar(type: Jar) {
+            archiveClassifier = 'sources'
+            from sourceSets.main.allSource
+        }
 
-    task javadocJar(type: Jar, dependsOn: javadoc) {
-        classifier = 'javadoc'
-        from javadoc.destinationDir
-    }
-
-    artifacts {
-        archives sourcesJar
-        archives javadocJar
+        task javadocJar(type: Jar) {
+            archiveClassifier = 'javadoc'
+            from javadoc.destinationDir
+        }
     }
 }

@@ -1,16 +1,15 @@
-version '0.0.1'
+version = '0.0.1'
 
 buildscript {
     ext {
-        kotlin_version = '1.4.31'
+        kotlin_version = '2.3.0'
     }
     repositories {
         mavenLocal()
         mavenCentral()
-        jcenter()
         google()
         maven {
-            url "https://plugins.gradle.org/m2/"
+            url = "https://plugins.gradle.org/m2/"
         }
     }
 
@@ -21,17 +20,17 @@ buildscript {
 
 apply plugin: 'kotlin'
 
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
+    }
+}
+
 dependencies {
     // may be latter
     // implementation "org.locationtech.jts:jts-core:1.16.1"
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    compile "com.soywiz.korlibs.kds:kds:2.0.9"
-    compile project(":geom")
-    compile project(":ai")
-}
-
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "com.soywiz.korlibs.kds:kds:4.0.10"
+    implementation project(":geom")
+    implementation project(":ai")
 }

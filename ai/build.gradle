@@ -1,17 +1,21 @@
 plugins {
     id 'org.jetbrains.kotlin.multiplatform'
 }
-version '0.0.1'
+version = '0.0.1'
 
 
 apply plugin: 'maven-publish'
 
-dependencies {
-    commonMainImplementation("com.soywiz.korlibs.kds:kds:2.0.9")
-}
-
 kotlin {
-    jvm()
+    jvm {
+        compilations.all {
+            compileTaskProvider.configure {
+                compilerOptions {
+                    jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
+                }
+            }
+        }
+    }
 // todo maybe enable one day
 //    js {
 //        browser {
@@ -28,6 +32,7 @@ kotlin {
             dependencies {
                 implementation kotlin('stdlib-common')
                 implementation project(":geom")
+                implementation "com.soywiz.korlibs.kds:kds:4.0.10"
             }
         }
         commonTest {
@@ -45,16 +50,6 @@ kotlin {
             dependencies {
                 implementation kotlin('test')
                 implementation kotlin('test-junit')
-            }
-        }
-        jsMain {
-            dependencies {
-                implementation kotlin('stdlib-js')
-            }
-        }
-        jsTest {
-            dependencies {
-                implementation kotlin('test-js')
             }
         }
     }
