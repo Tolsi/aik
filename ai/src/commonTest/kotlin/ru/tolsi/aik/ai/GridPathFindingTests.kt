@@ -80,9 +80,11 @@ class GridPathFindingTests {
     fun testAstarWithObstacle() {
         val grid = PathfindingGrid(10, 10)
 
-        // Create a wall
+        // Create a wall with a gap
         for (y in 0 until 10) {
-            grid.setWalkable(5, y, false)
+            if (y != 0) {  // Leave gap at y=0 for path to go through
+                grid.setWalkable(5, y, false)
+            }
         }
 
         val start = PointInt(0, 5)
@@ -94,8 +96,9 @@ class GridPathFindingTests {
         assertEquals(start, path.first())
         assertEquals(goal, path.last())
 
-        // Path should go around the wall
-        assertTrue(path.any { it.x != 5 || it.y != 5 })
+        // Path should go through the gap, not through the blocked cells
+        val goesThroughBlock = path.any { it.x == 5 && it.y in 1..9 }
+        assertTrue(!goesThroughBlock, "Path should not go through blocked cells")
     }
 
     @Test

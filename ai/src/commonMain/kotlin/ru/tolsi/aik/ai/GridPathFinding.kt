@@ -44,7 +44,16 @@ data class PathNode(
     val hCost: Double = 0.0,  // Heuristic cost to goal
     val totalCost: Double = gCost + hCost
 ) : Comparable<PathNode> {
-    override fun compareTo(other: PathNode): Int = totalCost.compareTo(other.totalCost)
+    override fun compareTo(other: PathNode): Int {
+        val costComparison = totalCost.compareTo(other.totalCost)
+        if (costComparison != 0) return costComparison
+
+        // Tie-breaker: compare by position to ensure sortedSetOf can handle nodes with same cost
+        val xComparison = position.x.compareTo(other.position.x)
+        if (xComparison != 0) return xComparison
+
+        return position.y.compareTo(other.position.y)
+    }
 
     fun reconstructPath(): List<PointInt> {
         val path = mutableListOf<PointInt>()
