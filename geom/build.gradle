@@ -7,7 +7,7 @@ version = '0.0.1'
 apply plugin: 'maven-publish'
 
 dependencies {
-    commonMainImplementation("com.soywiz.korlibs.kds:kds:4.0.10")
+    commonMainImplementation("com.soywiz:korlibs-datastructure:6.0.0")
 }
 
 kotlin {

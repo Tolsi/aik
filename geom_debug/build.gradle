@@ -30,7 +30,7 @@ dependencies {
     // may be latter
     // implementation "org.locationtech.jts:jts-core:1.16.1"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation "com.soywiz.korlibs.kds:kds:4.0.10"
+    implementation "com.soywiz:korlibs-datastructure:6.0.0"
     implementation project(":geom")
     implementation project(":ai")
 }

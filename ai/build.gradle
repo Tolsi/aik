@@ -32,7 +32,7 @@ kotlin {
             dependencies {
                 implementation kotlin('stdlib-common')
                 implementation project(":geom")
-                implementation "com.soywiz.korlibs.kds:kds:4.0.10"
+                implementation "com.soywiz:korlibs-datastructure:6.0.0"
             }
         }
         commonTest {

@@ -142,8 +142,9 @@ Figure2D (root interface)
 
 ## Dependencies
 
-- **com.soywiz.korlibs.kds:kds:4.0.10** - Kotlin Data Structures (Queue, Stack, Array2, DoubleArrayList, IntArrayList)
-  - Note: Package changed from `com.soywiz.kds` to `korlibs.datastructure` in version 4.x
+- **com.soywiz:korlibs-datastructure:6.0.0** - Kotlin Data Structures from KorGE/Korlibs (Queue, Stack, Array2, DoubleArrayList, IntArrayList)
+  - Package: `korlibs.datastructure.*`
+  - Part of the KorGE/Korlibs ecosystem
 - **Kotlin stdlib** (2.3.0) - Multi-platform standard library
 - **JUnit** (jvmTest only) - Testing framework
 
