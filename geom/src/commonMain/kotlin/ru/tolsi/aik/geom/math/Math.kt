@@ -52,3 +52,12 @@ fun Long.prevMultipleOf(multiple: Long) = if (this.isMultipleOf(multiple)) this 
 
 fun Int.isMultipleOf(multiple: Int) = multiple == 0 || (this % multiple) == 0
 fun Long.isMultipleOf(multiple: Long) = multiple == 0L || (this % multiple) == 0L
+
+// Quadrilateral utility functions
+fun allAlmostEqual(values: List<Double>, eps: Double = Geometry.EPS): Boolean {
+    if (values.size < 2) return true
+    val first = values[0]
+    return values.all { almostEquals(it, first, eps) }
+}
+
+fun almostEquals(a: Double, b: Double, eps: Double): Boolean = abs(a - b) <= eps

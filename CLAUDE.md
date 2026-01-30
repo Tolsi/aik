@@ -85,11 +85,49 @@ aik/
 
 ## Architecture Patterns
 
-### Interface + Implementation Pattern
-All major geometric types follow this pattern:
-- **Interface** (I-prefix): `IPoint`, `ILine`, `IPolygon`, etc.
-- **Implementation**: `Point`, `Line`, `Polygon`, etc.
+### Interface + Implementation Pattern (CRITICAL)
+**ALWAYS use interfaces (I-prefix) instead of concrete classes for all geometric types.**
+
+This pattern enables support for both Int and Double (Decimal) realizations:
+- **Interface** (I-prefix): `IPoint`, `ILine`, `IPolygon`, `IKite`, `IRectangle`, etc.
+- **Implementation**: `Point`, `Line`, `Polygon`, `Kite`, `Rectangle`, etc.
+- **Integer variants**: `PointInt`, `RectangleInt`, `KiteInt`, etc. (inline classes)
 - **Extensions**: Operator overloading and helper functions
+
+**Pattern structure:**
+```kotlin
+// 1. Interface with I-prefix
+interface IKite : IPolygon {
+    val p0: IPoint
+    val p1: IPoint
+    // ... properties
+}
+
+// 2. Implementation (open class for extensibility)
+open class Kite(
+    p0: IPoint,
+    p1: IPoint,
+    // ...
+    validate: Boolean = true
+) : IKite {
+    protected var _p0: Point = Point(p0.x, p0.y)
+    // ... protected storage
+
+    override val p0: IPoint get() = _p0
+    // ... implement interface
+}
+
+// 3. Integer variant (inline class)
+inline class KiteInt(val kite: Kite) {
+    // ... int accessors
+}
+```
+
+**Why this matters:**
+- Enables polymorphism across Double/Int types
+- Supports multi-platform implementations
+- Maintains immutable interface contracts while allowing mutable internal state
+- Consistent with existing codebase architecture
 
 ### Mutable vs Immutable
 - Interfaces define immutable contracts (`IPoint`, `IRectangle`, `ISize`)

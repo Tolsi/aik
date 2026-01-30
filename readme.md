@@ -44,32 +44,32 @@ I chose the geometric shapes that I used and the most popular in my opinion from
 
 [T] [Rectangle](https://en.wikipedia.org/wiki/Rectangle)
 
-☐ [Square](https://en.wikipedia.org/wiki/Square_(geometry)) ([topics](https://en.wikipedia.org/wiki/List_of_circle_topics))
+[T] [Square](https://en.wikipedia.org/wiki/Square_(geometry)) ([topics](https://en.wikipedia.org/wiki/List_of_circle_topics))
 
-☐ [Parallelogram](https://en.wikipedia.org/wiki/Parallelogram)
+[T] [Parallelogram](https://en.wikipedia.org/wiki/Parallelogram)
 
-☐ [Trapezoid](https://en.wikipedia.org/wiki/Trapezoid)
+[T] [Trapezoid](https://en.wikipedia.org/wiki/Trapezoid)
 
 [T] [Polygon](https://en.wikipedia.org/wiki/Polygon) ([topics](https://en.wikipedia.org/wiki/List_of_polygons,_polyhedra_and_polytopes)) - simple convex polygons
 
-☐ [Vertex](https://en.wikipedia.org/wiki/Vertex_(geometry))
+[T] [Vertex](https://en.wikipedia.org/wiki/Vertex_(geometry))
 
-☐ Triangle Vertex - vertex with additional information about the triangle
+[T] Triangle Vertex - vertex with additional information about the triangle (angles, bisectors, medians, altitudes)
 
 [T] [Circle](https://en.wikipedia.org/wiki/Circle)
 
-☐ [Circular sector](https://en.wikipedia.org/wiki/Circular_sector)
+[T] [Circular sector](https://en.wikipedia.org/wiki/Circular_sector)
 
-☐ [Circular segment](https://en.wikipedia.org/wiki/Circular_segment)
+[T] [Circular segment](https://en.wikipedia.org/wiki/Circular_segment)
 
-☐ [Ring](https://en.wikipedia.org/wiki/Annulus_(mathematics))
+[T] [Ring](https://en.wikipedia.org/wiki/Annulus_(mathematics))
 
-☐ [Ellipse](https://en.wikipedia.org/wiki/Ellipse)
+[T] [Ellipse](https://en.wikipedia.org/wiki/Ellipse)
 
-☐ [Oval](https://en.wikipedia.org/wiki/Oval)
+[T] [Stadium](https://en.wikipedia.org/wiki/Stadium_(geometry)) (previously listed as "Oval")
 
-☐ [Rhombus](https://en.wikipedia.org/wiki/Rhombus)
+[T] [Rhombus](https://en.wikipedia.org/wiki/Rhombus)
 
-☐ [Kite](https://en.wikipedia.org/wiki/Kite_(geometry))
+[T] [Kite](https://en.wikipedia.org/wiki/Kite_(geometry))
 
 
