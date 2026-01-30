@@ -26,14 +26,15 @@ class RhombusTests {
         val center = Point(0.0, 0.0)
         val rhombus = Rhombus.fromDiagonals(center, 8.0, 6.0)
 
+        // After CCW orientation fix, edge order changed: p1 and p3 are swapped
         assertEquals(-4.0, rhombus.p0.x)
         assertEquals(0.0, rhombus.p0.y)
         assertEquals(0.0, rhombus.p1.x)
-        assertEquals(3.0, rhombus.p1.y)
+        assertEquals(-3.0, rhombus.p1.y)  // Swapped with p3
         assertEquals(4.0, rhombus.p2.x)
         assertEquals(0.0, rhombus.p2.y)
         assertEquals(0.0, rhombus.p3.x)
-        assertEquals(-3.0, rhombus.p3.y)
+        assertEquals(3.0, rhombus.p3.y)  // Swapped with p1
     }
 
     @Test
@@ -90,10 +91,11 @@ class RhombusTests {
 
         val rhombus = Rhombus.fromPoints(p0, p1, p2, p3)
 
+        // After CCW orientation fix, edge order changed: p1 and p3 are swapped
         assertEquals(0.0, rhombus.p0.x)
         assertEquals(0.0, rhombus.p0.y)
         assertEquals(3.0, rhombus.p1.x)
-        assertEquals(4.0, rhombus.p1.y)
+        assertEquals(-4.0, rhombus.p1.y)  // Now p3 from input
     }
 
     @Test
@@ -205,10 +207,11 @@ class RhombusTests {
 
         val rhombusInt = RhombusInt.fromPoints(p0, p1, p2, p3)
 
+        // After CCW orientation fix, edge order changed: p1 and p3 are swapped
         assertEquals(0, rhombusInt.p0.x)
         assertEquals(0, rhombusInt.p0.y)
         assertEquals(3, rhombusInt.p1.x)
-        assertEquals(4, rhombusInt.p1.y)
+        assertEquals(-4, rhombusInt.p1.y)  // Now p3 from input
     }
 
     @Test

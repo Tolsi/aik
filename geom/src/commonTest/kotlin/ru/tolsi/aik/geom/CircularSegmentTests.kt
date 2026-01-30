@@ -210,8 +210,11 @@ class CircularSegmentTests {
             Angle.fromDegrees(0),
             Angle.fromDegrees(90)
         )
-        // Segment area should be less than sector area
-        assertTrue(segment.area < sector.area)
+
+        // 90° sector area = πr²/4 ≈ 78.54
+        assertEquals(78.54, sector.area, 0.01)
+        // 90° segment area = sector - triangle ≈ 28.54
+        assertEquals(28.54, segment.area, 0.01)
     }
 
     @Test

@@ -183,9 +183,10 @@ class CircularSectorTests {
             Angle.fromDegrees(90),
             totalPoints = 8
         )
-        // First point should be the center
-        assertEquals(5.0, sector.points.getX(0), 0.001)
-        assertEquals(5.0, sector.points.getY(0), 0.001)
+        // Last point should be the center (CCW orientation)
+        val lastIndex = sector.points.size - 1
+        assertEquals(5.0, sector.points.getX(lastIndex), 0.001)
+        assertEquals(5.0, sector.points.getY(lastIndex), 0.001)
     }
 
     @Test
