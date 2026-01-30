@@ -96,6 +96,104 @@ open class Ring(
         return distance >= innerRadius && distance <= outerRadius
     }
 
+    /**
+     * Check if this ring intersects with a point.
+     */
+    infix fun intersects(point: IPoint): Boolean = containsPoint(point.x, point.y)
+
+    /**
+     * Check if this ring intersects with a circle.
+     * Returns true if the circle overlaps with the ring area.
+     */
+    infix fun intersects(circle: Circle): Boolean {
+        val dx = circle.x - _center.x
+        val dy = circle.y - _center.y
+        val distSquared = dx * dx + dy * dy
+        val dist = kotlin.math.sqrt(distSquared)
+
+        // Circle center distance from ring center
+        val closestPoint = dist - circle.radius  // Closest point of circle to ring center
+        val farthestPoint = dist + circle.radius  // Farthest point of circle from ring center
+
+        // Check if circle overlaps with ring area
+        // Circle intersects if: closest point <= outer radius AND farthest point >= inner radius
+        return closestPoint <= outerRadius && farthestPoint >= innerRadius
+    }
+
+    /**
+     * Check if this ring intersects with another ring.
+     */
+    infix fun intersects(other: IRing): Boolean {
+        val dx = other.center.x - _center.x
+        val dy = other.center.y - _center.y
+        val dist = kotlin.math.sqrt(dx * dx + dy * dy)
+
+        // Check if the rings' areas overlap
+        // Outer circles must be close enough, inner circles must not completely separate them
+        val outerOverlap = dist <= outerRadius + other.outerRadius
+        val innerSeparation = dist >= kotlin.math.abs(innerRadius - other.innerRadius)
+
+        return outerOverlap && innerSeparation
+    }
+
+    /**
+     * Check if this ring intersects with a rectangle.
+     */
+    infix fun intersects(rect: IRectangle): Boolean {
+        // Quick bounding box check
+        val ringLeft = _center.x - outerRadius
+        val ringRight = _center.x + outerRadius
+        val ringTop = _center.y - outerRadius
+        val ringBottom = _center.y + outerRadius
+
+        if (ringRight < rect.left || ringLeft > rect.right ||
+            ringBottom < rect.top || ringTop > rect.bottom
+        ) {
+            return false
+        }
+
+        // Check if any corner of rectangle is inside ring
+        if (containsPoint(rect.left, rect.top) || containsPoint(rect.right, rect.top) ||
+            containsPoint(rect.left, rect.bottom) || containsPoint(rect.right, rect.bottom)
+        ) {
+            return true
+        }
+
+        // Check if any point on ring is inside rectangle
+        return points.any { rect.containsPoint(it.x, it.y) }
+    }
+
+    /**
+     * Check if this ring intersects with a line segment.
+     */
+    infix fun intersects(line: ILine): Boolean {
+        // Check if either endpoint is inside ring
+        if (containsPoint(line.from.x, line.from.y) || containsPoint(line.to.x, line.to.y)) {
+            return true
+        }
+
+        // Check if line crosses the ring (intersects outer circle but not completely inside inner circle)
+        // Distance from center to line segment
+        val dx = line.to.x - line.from.x
+        val dy = line.to.y - line.from.y
+        val lenSquared = dx * dx + dy * dy
+
+        if (lenSquared < 1e-10) {
+            // Degenerate line segment, just check the point
+            return containsPoint(line.from.x, line.from.y)
+        }
+
+        // Project center onto line segment
+        val t = ((_center.x - line.from.x) * dx + (_center.y - line.from.y) * dy) / lenSquared
+        val projX = if (t < 0) line.from.x else if (t > 1) line.to.x else line.from.x + t * dx
+        val projY = if (t < 0) line.from.y else if (t > 1) line.to.y else line.from.y + t * dy
+
+        val distToLine = hypot(_center.x - projX, _center.y - projY)
+
+        // Line intersects ring if closest point is within ring bounds
+        return distToLine >= innerRadius && distToLine <= outerRadius
+    }
+
     override fun toString(): String =
         "Ring(center=$_center, innerRadius=$innerRadius, outerRadius=$outerRadius)"
 

@@ -130,6 +130,115 @@ open class Stadium(
     }
 
     /**
+     * Check if this stadium intersects with a point.
+     */
+    infix fun intersects(point: IPoint): Boolean = containsPoint(point.x, point.y)
+
+    /**
+     * Check if this stadium intersects with a circle.
+     */
+    infix fun intersects(circle: Circle): Boolean {
+        val radius = height / 2.0
+        val halfStraight = (width - height) / 2.0
+
+        // Check if circle intersects with middle rectangle
+        val rectLeft = this.x - halfStraight
+        val rectRight = this.x + halfStraight
+        val rectTop = this.y - radius
+        val rectBottom = this.y + radius
+
+        // Closest point on rectangle to circle center
+        val closestX = circle.x.coerceIn(rectLeft, rectRight)
+        val closestY = circle.y.coerceIn(rectTop, rectBottom)
+        val distToRect = hypot(circle.x - closestX, circle.y - closestY)
+
+        if (distToRect <= circle.radius) {
+            return true
+        }
+
+        // Check if circle intersects with left semicircle
+        val leftCenterX = this.x - halfStraight
+        val distToLeft = hypot(circle.x - leftCenterX, circle.y - this.y)
+        if (distToLeft <= radius + circle.radius) {
+            return true
+        }
+
+        // Check if circle intersects with right semicircle
+        val rightCenterX = this.x + halfStraight
+        val distToRight = hypot(circle.x - rightCenterX, circle.y - this.y)
+        if (distToRight <= radius + circle.radius) {
+            return true
+        }
+
+        return false
+    }
+
+    /**
+     * Check if this stadium intersects with a rectangle.
+     */
+    infix fun intersects(rect: IRectangle): Boolean {
+        val radius = height / 2.0
+        val halfStraight = (width - height) / 2.0
+
+        // Quick bounding box check
+        val stadiumLeft = this.x - halfStraight - radius
+        val stadiumRight = this.x + halfStraight + radius
+        val stadiumTop = this.y - radius
+        val stadiumBottom = this.y + radius
+
+        if (stadiumRight < rect.left || stadiumLeft > rect.right ||
+            stadiumBottom < rect.top || stadiumTop > rect.bottom
+        ) {
+            return false
+        }
+
+        // Check if any corner of rectangle is inside stadium
+        if (containsPoint(rect.left, rect.top) || containsPoint(rect.right, rect.top) ||
+            containsPoint(rect.left, rect.bottom) || containsPoint(rect.right, rect.bottom)
+        ) {
+            return true
+        }
+
+        // Check if any point on stadium is inside rectangle
+        return points.any { rect.containsPoint(it.x, it.y) }
+    }
+
+    /**
+     * Check if this stadium intersects with a line segment.
+     */
+    infix fun intersects(line: ILine): Boolean {
+        // Check if either endpoint is inside stadium
+        if (containsPoint(line.from.x, line.from.y) || containsPoint(line.to.x, line.to.y)) {
+            return true
+        }
+
+        val radius = height / 2.0
+        val halfStraight = (width - height) / 2.0
+
+        // Check intersection with middle rectangle
+        val rectLeft = this.x - halfStraight
+        val rectRight = this.x + halfStraight
+        val rectTop = this.y - radius
+        val rectBottom = this.y + radius
+
+        // Simple line-rectangle intersection using endpoints
+        if ((line.from.x >= rectLeft && line.from.x <= rectRight &&
+             line.from.y >= rectTop && line.from.y <= rectBottom) ||
+            (line.to.x >= rectLeft && line.to.x <= rectRight &&
+             line.to.y >= rectTop && line.to.y <= rectBottom)) {
+            return true
+        }
+
+        // Check if line intersects any edge of approximated polygon
+        return points.indices.any { i ->
+            val p1 = points[i]
+            val p2 = points[(i + 1) % points.size]
+            val edge = LineSegment(p1, p2)
+            line.intersects(edge) != null
+        }
+    }
+
+    /**
      * Returns true if this stadium is actually a circle (width == height).
      */
     val isCircle: Boolean
