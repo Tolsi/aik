@@ -36,12 +36,14 @@ class AWTDebugDrawer(val size: Rectangle, val panel: GeometricPanelWithZoom) : D
         when (f) {
             is ILine -> {
                 f.edges().forEach {
-                    graphics.drawLine(
-                        fieldXCoordinate(it.from.x),
-                        fieldYCoordinate(it.from.y),
-                        fieldXCoordinate(it.to.x),
-                        fieldYCoordinate(it.to.y)
-                    )
+                    // Skip edges with duplicate points (can happen with very small shapes after rounding)
+                    val x1 = fieldXCoordinate(it.from.x)
+                    val y1 = fieldYCoordinate(it.from.y)
+                    val x2 = fieldXCoordinate(it.to.x)
+                    val y2 = fieldYCoordinate(it.to.y)
+                    if (x1 != x2 || y1 != y2) {
+                        graphics.drawLine(x1, y1, x2, y2)
+                    }
                 }
                 f.points.forEach {
                     val r = it.toRectangleWithCenterInPoint(0.1)
@@ -54,8 +56,14 @@ class AWTDebugDrawer(val size: Rectangle, val panel: GeometricPanelWithZoom) : D
                 }
             }
             is IPolygon ->
-                f.edges().forEach {
-                    draw(it, depth, c)
+                try {
+                    f.edges().forEach {
+                        draw(it, depth, c)
+                    }
+                } catch (e: IllegalArgumentException) {
+                    // Skip shapes that generate invalid edges (duplicate points)
+                    println("Warning: Skipping polygon ${f.javaClass.simpleName} with duplicate points: ${e.message}")
+                    println("Polygon has ${f.points.size} points")
                 }
         }
     }

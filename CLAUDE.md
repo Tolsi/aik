@@ -145,6 +145,59 @@ All floating-point comparisons use epsilon tolerance:
 - Point comparison uses `PointEPSKey` for hash-based collections
 - All geometric operations account for floating-point precision
 
+### Polygon Orientation (Winding Order)
+
+**CRITICAL**: All closed polygons (IPolygon implementations) MUST use **counter-clockwise (CCW)** point ordering for polygon clipping operations to work correctly.
+
+**Why CCW orientation is required:**
+
+The Sutherland-Hodgman polygon clipping algorithm (`IPolygon.clip()`) uses the cross product to determine if a point is "inside" or "outside" relative to each edge:
+
+```kotlin
+val pos = (x2 - x1) * (py - y1) - (y2 - y1) * (px - x1)
+if (pos < 0) { /* point is inside */ }
+```
+
+This formula computes the Z-component of the cross product, where:
+- **Negative value** → point is to the RIGHT of the directed edge (from p1 to p2)
+- **Positive value** → point is to the LEFT of the directed edge
+
+For a **counter-clockwise polygon**, as you traverse the edges in order, the interior of the polygon is on your **right side** (negative cross product). This is why the algorithm checks `pos < 0` for "inside".
+
+For a **clockwise polygon**, the interior would be on the left side, causing the clipping algorithm to fail (returning empty results or incorrect geometry).
+
+**Checking orientation:**
+
+Use the signed area (shoelace formula) to determine orientation:
+```kotlin
+fun signedArea(points: IPointArrayList): Double {
+    var area = 0.0
+    var j = points.size - 1
+    for (i in points.indices) {
+        area += (points.getX(j) + points.getX(i)) * (points.getY(j) - points.getY(i))
+        j = i
+    }
+    return area / 2.0
+}
+```
+- **Positive signed area** → counter-clockwise (CCW) ✓ correct
+- **Negative signed area** → clockwise (CW) ✗ needs reversal
+
+**Shapes requiring CCW orientation:**
+- Stadium (fixed in Stadium.kt:70-107)
+- Circle (already CCW via Angle.cos01/sin01)
+- Ellipse
+- CircularSector
+- CircularSegment
+- Ring
+- All quadrilaterals (Rectangle, Kite, Parallelogram, Rhombus, Trapezoid, Square)
+- Triangle (has fixOrientation parameter to handle this)
+- Custom Polygon instances
+
+**Testing orientation:**
+
+All shape test files should include a `testCounterClockwiseOrientation()` test that verifies positive signed area.
+
 ## Key Geometric Hierarchies
 
 ```
@@ -235,3 +288,150 @@ Lines and segments classify points relative to themselves:
 - Use integer variants (`PointInt`, `RectangleInt`) for grid-based operations
 - TSP: prefer `twoWaysBfsTravellingSalesmanProblem()` over DFS variant
 - Polygon simplification removes collinear points: use `IPolygon.simplify()`
+
+## Shape Constructors Reference
+
+**IMPORTANT**: Different shapes accept different parameter types. Always check constructor signatures before instantiating shapes.
+
+### Quick Reference Table
+
+| Shape | Accepts IPoint | Accepts x,y coords | Notes |
+|-------|----------------|-------------------|-------|
+| **Line** | ✓ | ✓ (via operator) | `Line(from: IPoint, to: IPoint)` or `Line(x1, y1, x2, y2)` |
+| **LineSegment** | ✓ | ✗ | `LineSegment(from: IPoint, to: IPoint)` only |
+| **Ray** | ✓ | ✗ | `Ray(from: IPoint, to: IPoint)` only |
+| **Triangle** | ✓ | ✗ | `Triangle(p0, p1, p2, fixOrientation, checkOrientation)` |
+| **Rectangle** | ✗ | ✓ | `Rectangle(x, y, width, height)` |
+| **Circle** | ✗ | ✓ | `Circle(x, y, radius, totalPoints)` |
+| **Polygon** | ✓ | ✗ | `Polygon(points: IPointArrayList)` |
+| **Polyline** | ✓ | ✗ | `Polyline(points: IPointArrayList)` |
+| **Kite** | ✓ | ✗ | `Kite(p0, p1, p2, p3, validate)` |
+| **Parallelogram** | ✓ | ✗ | `Parallelogram(p0, edge1, edge2, validate)` |
+| **Trapezoid** | ✓ | ✗ | `Trapezoid(p0, p1, p2, p3, validate)` |
+| **CircularSector** | ✓ | ✓ | Both: `(x, y, ...)` or `(center: IPoint, ...)` |
+| **CircularSegment** | ✓ | ✓ | Both: `(x, y, ...)` or `(center: IPoint, ...)` |
+| **Ring** | ✓ | ✓ | Both: `(x, y, ...)` or `(center: IPoint, ...)` |
+| **Stadium** | ✓ | ✓ | Both: `(x, y, ...)` or `(center: IPoint, ...)` |
+| **Ellipse** | ✓ | ✓ | Both: `(x, y, ...)` or `(center: IPoint, ...)` |
+
+### Detailed Constructor Signatures
+
+#### Lines and Rays
+```kotlin
+// Line - accepts both
+Line(from: IPoint, to: IPoint)
+Line(x1: Number, y1: Number, x2: Number, y2: Number)  // via operator invoke
+
+// LineSegment - IPoint only
+LineSegment(from: IPoint, to: IPoint)
+
+// Ray - IPoint only
+Ray(from: IPoint, to: IPoint)
+```
+
+#### Polygonal Shapes
+```kotlin
+// Triangle - IPoint only (via operator invoke)
+Triangle(p0: IPoint, p1: IPoint, p2: IPoint,
+         fixOrientation: Boolean = false,
+         checkOrientation: Boolean = true)
+
+// Rectangle - raw coordinates
+Rectangle(x: Double, y: Double, width: Double, height: Double)
+Rectangle(x: Number, y: Number, width: Number, height: Number)  // via operator
+
+// Polygon - collection of points
+Polygon(points: IPointArrayList)
+
+// Polyline - collection of points
+Polyline(points: IPointArrayList)
+```
+
+#### Quadrilaterals
+```kotlin
+// Kite - IPoint only
+Kite(p0: IPoint, p1: IPoint, p2: IPoint, p3: IPoint, validate: Boolean = true)
+
+// Parallelogram - IPoint only
+Parallelogram(p0: IPoint, edge1: IPoint, edge2: IPoint, validate: Boolean = true)
+
+// Trapezoid - IPoint only
+Trapezoid(p0: IPoint, p1: IPoint, p2: IPoint, p3: IPoint, validate: Boolean = true)
+```
+
+#### Circular Shapes
+```kotlin
+// Circle - raw coordinates only
+Circle(x: Double, y: Double, radius: Double, totalPoints: Int = 32)
+
+// CircularSector - both variants
+CircularSector(x: Double, y: Double, radius: Double,
+               startAngle: Angle, endAngle: Angle, totalPoints: Int = 32)
+CircularSector(center: IPoint, radius: Double,
+               startAngle: Angle, endAngle: Angle, totalPoints: Int = 32)
+
+// CircularSegment - both variants
+CircularSegment(x: Double, y: Double, radius: Double,
+                startAngle: Angle, endAngle: Angle, totalPoints: Int = 32)
+CircularSegment(center: IPoint, radius: Double,
+                startAngle: Angle, endAngle: Angle, totalPoints: Int = 32)
+
+// Ring - both variants
+Ring(x: Double, y: Double, innerRadius: Double, outerRadius: Double,
+     totalPoints: Int = 32)
+Ring(center: IPoint, innerRadius: Double, outerRadius: Double,
+     totalPoints: Int = 32)
+
+// Ellipse - both variants
+Ellipse(x: Double, y: Double, semiMajorAxis: Double, semiMinorAxis: Double,
+        rotation: Angle = Angle.ZERO, totalPoints: Int = 64)
+Ellipse(center: IPoint, semiMajorAxis: Double, semiMinorAxis: Double,
+        rotation: Angle = Angle.ZERO, totalPoints: Int = 64)
+
+// Stadium - both variants (WARNING: may have point duplication issues)
+Stadium(x: Double, y: Double, width: Double, height: Double,
+        totalPoints: Int = 16)
+Stadium(center: IPoint, width: Double, height: Double,
+        totalPoints: Int = 16)
+```
+
+### Common Patterns
+
+**Creating shapes with Point objects:**
+```kotlin
+val p1 = Point(10, 20)
+val p2 = Point(30, 40)
+
+val line = Line(p1, p2)              // ✓ Works
+val segment = LineSegment(p1, p2)    // ✓ Works
+val triangle = Triangle(p1, p2, Point(50, 60))  // ✓ Works
+```
+
+**Creating shapes with raw coordinates:**
+```kotlin
+val line = Line(10, 20, 30, 40)           // ✓ Works (operator invoke)
+val rect = Rectangle(10, 20, 100, 50)     // ✓ Works
+val circle = Circle(50, 50, 25)           // ✓ Works
+val sector = CircularSector(50, 50, 25, Angle.ZERO, Angle.fromDegrees(90))  // ✓ Works
+```
+
+**Common mistakes to avoid:**
+```kotlin
+// ✗ WRONG - LineSegment doesn't accept raw coordinates
+val segment = LineSegment(10, 20, 30, 40)  // COMPILE ERROR
+
+// ✓ CORRECT
+val segment = LineSegment(Point(10, 20), Point(30, 40))
+
+// ✗ WRONG - Circle requires raw coordinates, not Point
+val circle = Circle(Point(50, 50), 25)  // COMPILE ERROR (unless using secondary constructor)
+
+// ✓ CORRECT
+val circle = Circle(50, 50, 25)
+
+// ✗ WRONG - Triangle parameter names changed
+val tri = Triangle(p1, p2, p3, validate = false)  // COMPILE ERROR
+
+// ✓ CORRECT
+val tri = Triangle(p1, p2, p3, fixOrientation = false, checkOrientation = false)
+```

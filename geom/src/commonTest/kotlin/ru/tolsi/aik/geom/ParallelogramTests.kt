@@ -214,4 +214,51 @@ class ParallelogramTests {
         assertEquals(4.0, parallelogram.edge1.x)
         assertEquals(3.0, parallelogram.edge2.y)
     }
+
+    @Test
+    fun testCounterClockwiseOrientation() {
+        val parallelogram = Parallelogram(
+            Point(0.0, 0.0),
+            Point(4.0, 0.0),
+            Point(0.0, 3.0)
+        )
+        val points = parallelogram.points
+
+        var signedArea = 0.0
+        var j = points.size - 1
+        for (i in points.indices) {
+            signedArea += (points.getX(j) + points.getX(i)) * (points.getY(j) - points.getY(i))
+            j = i
+        }
+        signedArea /= 2.0
+
+        assertTrue(
+            signedArea > 0,
+            "Parallelogram must have counter-clockwise orientation (positive signed area), got $signedArea"
+        )
+    }
+
+    @Test
+    fun testClosureAndContinuity() {
+        val parallelogram = Parallelogram(
+            Point(0.0, 0.0),
+            Point(4.0, 0.0),
+            Point(0.0, 3.0)
+        )
+        val points = parallelogram.points
+
+        assertTrue(points.size == 4, "Parallelogram should have 4 points")
+        assertTrue(parallelogram.closed, "Parallelogram should be marked as closed")
+
+        for (i in 0 until points.size) {
+            val p1 = Point(points.getX(i), points.getY(i))
+            val p2 = Point(points.getX((i + 1) % points.size), points.getY((i + 1) % points.size))
+            val distance = p1.distanceTo(p2)
+
+            assertTrue(
+                distance > Geometry.EPS,
+                "Consecutive points should not be duplicates at indices $i and ${(i + 1) % points.size}"
+            )
+        }
+    }
 }

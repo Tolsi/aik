@@ -43,10 +43,11 @@ open class Parallelogram(
 
     override val points: IPointArrayList
         get() = PointArrayList(4).apply {
+            // Counter-clockwise order
             add(p0)
-            add(p1)
-            add(p2)
             add(p3)
+            add(p2)
+            add(p1)
         }
 
     override val area: Double

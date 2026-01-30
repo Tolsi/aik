@@ -186,4 +186,43 @@ class RingTests {
         assertEquals(3.0, ringFloat.innerRadius)
         assertEquals(8.0, ringFloat.outerRadius)
     }
+
+    @Test
+    fun testCounterClockwiseOrientation() {
+        val ring = Ring(0.0, 0.0, 3.0, 8.0)
+        val points = ring.points
+
+        var signedArea = 0.0
+        var j = points.size - 1
+        for (i in points.indices) {
+            signedArea += (points.getX(j) + points.getX(i)) * (points.getY(j) - points.getY(i))
+            j = i
+        }
+        signedArea /= 2.0
+
+        assertTrue(
+            signedArea > 0,
+            "Ring must have counter-clockwise orientation (positive signed area), got $signedArea"
+        )
+    }
+
+    @Test
+    fun testClosureAndContinuity() {
+        val ring = Ring(0.0, 0.0, 3.0, 8.0, totalPoints = 32)
+        val points = ring.points
+
+        assertTrue(points.size > 0, "Ring should have points")
+        assertTrue(ring.closed, "Ring should be marked as closed")
+
+        for (i in 0 until points.size) {
+            val p1 = Point(points.getX(i), points.getY(i))
+            val p2 = Point(points.getX((i + 1) % points.size), points.getY((i + 1) % points.size))
+            val distance = p1.distanceTo(p2)
+
+            assertTrue(
+                distance < 10.0,
+                "Gap too large between points $i and ${(i + 1) % points.size}: $distance"
+            )
+        }
+    }
 }

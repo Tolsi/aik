@@ -255,4 +255,53 @@ class KiteTests {
         assertEquals(0.0, kite.p0.x)
         assertEquals(0.0, kite.p0.y)
     }
+
+    @Test
+    fun testCounterClockwiseOrientation() {
+        val kite = Kite(
+            Point(0.0, 0.0),
+            Point(3.0, 4.0),
+            Point(0.0, 8.0),
+            Point(-3.0, 4.0)
+        )
+        val points = kite.points
+
+        var signedArea = 0.0
+        var j = points.size - 1
+        for (i in points.indices) {
+            signedArea += (points.getX(j) + points.getX(i)) * (points.getY(j) - points.getY(i))
+            j = i
+        }
+        signedArea /= 2.0
+
+        assertTrue(
+            signedArea > 0,
+            "Kite must have counter-clockwise orientation (positive signed area), got $signedArea"
+        )
+    }
+
+    @Test
+    fun testClosureAndContinuity() {
+        val kite = Kite(
+            Point(0.0, 0.0),
+            Point(3.0, 4.0),
+            Point(0.0, 8.0),
+            Point(-3.0, 4.0)
+        )
+        val points = kite.points
+
+        assertTrue(points.size == 4, "Kite should have 4 points")
+        assertTrue(kite.closed, "Kite should be marked as closed")
+
+        for (i in 0 until points.size) {
+            val p1 = Point(points.getX(i), points.getY(i))
+            val p2 = Point(points.getX((i + 1) % points.size), points.getY((i + 1) % points.size))
+            val distance = p1.distanceTo(p2)
+
+            assertTrue(
+                distance > Geometry.EPS,
+                "Consecutive points should not be duplicates at indices $i and ${(i + 1) % points.size}"
+            )
+        }
+    }
 }

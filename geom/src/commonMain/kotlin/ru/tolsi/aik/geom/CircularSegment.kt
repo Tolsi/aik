@@ -87,9 +87,9 @@ open class CircularSegment(
 
     override val points: IPointArrayList by lazy {
         PointArrayList(totalPoints + 1).apply {
-            // Add arc points (NO center point)
+            // Counter-clockwise orientation: arc from end to start
             val sweep = sweepAngle.radians
-            for (i in 0..totalPoints) {
+            for (i in totalPoints downTo 0) {
                 val ratio = i.toDouble() / totalPoints
                 val angle = _startAngle.radians + sweep * ratio
                 add(

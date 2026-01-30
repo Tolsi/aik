@@ -72,26 +72,47 @@ open class Stadium(
         val halfStraight = (width - height) / 2.0
         val pointsPerSemiCircle = totalPoints
 
-        PointArrayList(pointsPerSemiCircle * 2 + 4).apply {
-            // Left semicircle (270° to 90°, or -π/2 to π/2)
+        PointArrayList(pointsPerSemiCircle * 2 + 2).apply {
+            // Counter-clockwise winding order for Sutherland-Hodgman clipping
+            // Start at top-right and go counter-clockwise
+
+            // Top right connection point
+            val topRight = Point(x + halfStraight, y + radius)
+            add(topRight.x, topRight.y)
+
+            // Right semicircle (90° down to 270°, going backwards for CCW)
+            // Go from top to bottom on right side
+            val rightCenter = Point(x + halfStraight, y)
+            for (i in (pointsPerSemiCircle - 1) downTo 1) {
+                val angle = 3.0 * PI / 2.0 + i.toDouble() * PI / pointsPerSemiCircle
+                add(
+                    rightCenter.x + kotlin.math.cos(angle) * radius,
+                    rightCenter.y + kotlin.math.sin(angle) * radius
+                )
+            }
+
+            // Bottom right connection
+            val bottomRight = Point(x + halfStraight, y - radius)
+            add(bottomRight.x, bottomRight.y)
+
+            // Bottom left connection
+            val bottomLeft = Point(x - halfStraight, y - radius)
+            add(bottomLeft.x, bottomLeft.y)
+
+            // Left semicircle (270° up to 90°, going backwards for CCW)
+            // Go from bottom to top on left side
             val leftCenter = Point(x - halfStraight, y)
-            for (i in 0..pointsPerSemiCircle) {
-                val angle = PI * (1.5 + 0.5 * i / pointsPerSemiCircle)
+            for (i in (pointsPerSemiCircle - 1) downTo 1) {
+                val angle = PI / 2.0 + i.toDouble() * PI / pointsPerSemiCircle
                 add(
                     leftCenter.x + kotlin.math.cos(angle) * radius,
                     leftCenter.y + kotlin.math.sin(angle) * radius
                 )
             }
 
-            // Right semicircle (90° to 270°, or π/2 to 3π/2)
-            val rightCenter = Point(x + halfStraight, y)
-            for (i in 0..pointsPerSemiCircle) {
-                val angle = PI * (0.5 + i / pointsPerSemiCircle)
-                add(
-                    rightCenter.x + kotlin.math.cos(angle) * radius,
-                    rightCenter.y + kotlin.math.sin(angle) * radius
-                )
-            }
+            // Top left connection (polygon will auto-close back to top-right)
+            val topLeft = Point(x - halfStraight, y + radius)
+            add(topLeft.x, topLeft.y)
         }
     }
 

@@ -79,12 +79,11 @@ open class CircularSector(
 
     override val points: IPointArrayList by lazy {
         PointArrayList(totalPoints + 2).apply {
-            // Start at center
-            add(_center.x, _center.y)
-
-            // Add arc points from startAngle to endAngle
+            // Counter-clockwise orientation: arc from end to start, then center
             val sweep = sweepAngle.radians
-            for (i in 0..totalPoints) {
+
+            // Add arc points from endAngle back to startAngle (reversed for CCW)
+            for (i in totalPoints downTo 0) {
                 val ratio = i.toDouble() / totalPoints
                 val angle = _startAngle.radians + sweep * ratio
                 add(
@@ -93,7 +92,8 @@ open class CircularSector(
                 )
             }
 
-            // Close back to center (automatic polygon closure will handle this)
+            // Add center last (polygon closes back to first arc point)
+            add(_center.x, _center.y)
         }
     }
 

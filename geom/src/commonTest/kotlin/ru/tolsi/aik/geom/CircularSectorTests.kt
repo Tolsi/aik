@@ -250,4 +250,29 @@ class CircularSectorTests {
         // Point at 180° should be outside
         assertFalse(sector.containsPoint(-5.0, 0.0))
     }
+
+    @Test
+    fun testCounterClockwiseOrientation() {
+        val sector = CircularSector(
+            0.0, 0.0, 10.0,
+            Angle.fromRadians(0.0),
+            Angle.fromRadians(PI)
+        )
+        val points = sector.points
+
+        // Calculate signed area using shoelace formula
+        var signedArea = 0.0
+        var j = points.size - 1
+        for (i in points.indices) {
+            signedArea += (points.getX(j) + points.getX(i)) * (points.getY(j) - points.getY(i))
+            j = i
+        }
+        signedArea /= 2.0
+
+        // Positive signed area means counter-clockwise orientation
+        assertTrue(
+            signedArea > 0,
+            "CircularSector must have counter-clockwise orientation (positive signed area), got $signedArea"
+        )
+    }
 }

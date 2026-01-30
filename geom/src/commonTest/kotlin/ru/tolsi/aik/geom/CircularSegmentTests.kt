@@ -277,4 +277,56 @@ class CircularSegmentTests {
         assertEquals(10.0, segmentFloat.center.y)
         assertEquals(20.0, segmentFloat.radius)
     }
+
+    @Test
+    fun testCounterClockwiseOrientation() {
+        val segment = CircularSegment(
+            0.0, 0.0, 10.0,
+            Angle.fromRadians(0.0),
+            Angle.fromRadians(kotlin.math.PI)
+        )
+        val points = segment.points
+
+        var signedArea = 0.0
+        var j = points.size - 1
+        for (i in points.indices) {
+            signedArea += (points.getX(j) + points.getX(i)) * (points.getY(j) - points.getY(i))
+            j = i
+        }
+        signedArea /= 2.0
+
+        assertTrue(
+            signedArea > 0,
+            "CircularSegment must have counter-clockwise orientation (positive signed area), got $signedArea"
+        )
+    }
+
+    @Test
+    fun testClosureAndContinuity() {
+        val segment = CircularSegment(
+            0.0, 0.0, 10.0,
+            Angle.fromRadians(0.0),
+            Angle.fromRadians(kotlin.math.PI),
+            totalPoints = 32
+        )
+        val points = segment.points
+
+        assertTrue(points.size > 0, "CircularSegment should have points")
+        assertTrue(segment.closed, "CircularSegment should be marked as closed")
+
+        // For circular segment, the last edge is a chord connecting arc endpoints
+        // which can be up to 2*radius in length
+        val maxChordLength = 2.0 * segment.radius + 1.0
+
+        for (i in 0 until points.size) {
+            val p1 = Point(points.getX(i), points.getY(i))
+            val p2 = Point(points.getX((i + 1) % points.size), points.getY((i + 1) % points.size))
+            val distance = p1.distanceTo(p2)
+
+            assertTrue(
+                distance < maxChordLength,
+                "Gap too large between points $i and ${(i + 1) % points.size}: $distance"
+            )
+        }
+    }
 }

@@ -81,8 +81,9 @@ open class Rhombus : Parallelogram, IRhombus {
                 }
             }
 
-            val edge1 = p1 - p0
-            val edge2 = p3 - p0
+            // Swap edges to ensure counter-clockwise orientation
+            val edge1 = p3 - p0
+            val edge2 = p1 - p0
             return Rhombus(p0, edge1, edge2)
         }
 

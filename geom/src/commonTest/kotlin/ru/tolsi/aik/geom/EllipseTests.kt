@@ -236,4 +236,45 @@ class EllipseTests {
         assertEquals(8.0, ellipseFloat.semiMajorAxis)
         assertEquals(4.0, ellipseFloat.semiMinorAxis)
     }
+
+    @Test
+    fun testCounterClockwiseOrientation() {
+        val ellipse = Ellipse(0.0, 0.0, 10.0, 5.0)
+        val points = ellipse.points
+
+        var signedArea = 0.0
+        var j = points.size - 1
+        for (i in points.indices) {
+            signedArea += (points.getX(j) + points.getX(i)) * (points.getY(j) - points.getY(i))
+            j = i
+        }
+        signedArea /= 2.0
+
+        assertTrue(
+            signedArea > 0,
+            "Ellipse must have counter-clockwise orientation (positive signed area), got $signedArea"
+        )
+    }
+
+    @Test
+    fun testClosureAndContinuity() {
+        val ellipse = Ellipse(0.0, 0.0, 10.0, 5.0, totalPoints = 32)
+        val points = ellipse.points
+
+        assertTrue(points.size > 0, "Ellipse should have points")
+        assertTrue(ellipse.closed, "Ellipse should be marked as closed")
+
+        // Check continuity - no large gaps between consecutive points
+        for (i in 0 until points.size) {
+            val p1 = Point(points.getX(i), points.getY(i))
+            val p2 = Point(points.getX((i + 1) % points.size), points.getY((i + 1) % points.size))
+            val distance = p1.distanceTo(p2)
+
+            // For ellipse, max gap should be reasonable fraction of perimeter
+            assertTrue(
+                distance < 5.0,
+                "Gap too large between points $i and ${(i + 1) % points.size}: $distance"
+            )
+        }
+    }
 }

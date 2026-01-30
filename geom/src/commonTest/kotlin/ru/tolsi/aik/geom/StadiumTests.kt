@@ -192,4 +192,73 @@ class StadiumTests {
         assertEquals(30.0, stadiumFloat.width)
         assertEquals(10.0, stadiumFloat.height)
     }
+
+    @Test
+    fun testCounterClockwiseOrientation() {
+        val stadium = Stadium(0.0, 0.0, 30.0, 10.0, totalPoints = 16)
+        val points = stadium.points
+
+        // Calculate signed area using shoelace formula
+        var signedArea = 0.0
+        var j = points.size - 1
+        for (i in points.indices) {
+            signedArea += (points.getX(j) + points.getX(i)) * (points.getY(j) - points.getY(i))
+            j = i
+        }
+        signedArea /= 2.0
+
+        // Positive signed area means counter-clockwise orientation
+        assertTrue(
+            signedArea > 0,
+            "Stadium must have counter-clockwise orientation (positive signed area), got $signedArea"
+        )
+    }
+
+    @Test
+    fun testNoGapsInPoints() {
+        val stadium = Stadium(0.0, 0.0, 30.0, 10.0, totalPoints = 16)
+        val points = stadium.points
+
+        // Check that we have points
+        assertTrue(points.size > 0, "Stadium should have points")
+
+        val radius = stadium.radius
+        val straightLength = stadium.straightLength
+
+        // Check consecutive points
+        for (i in 0 until points.size) {
+            val p1 = Point(points.getX(i), points.getY(i))
+            val p2 = Point(points.getX((i + 1) % points.size), points.getY((i + 1) % points.size))
+            val distance = p1.distanceTo(p2)
+            val dx = kotlin.math.abs(p2.x - p1.x)
+            val dy = kotlin.math.abs(p2.y - p1.y)
+
+            // Check no duplicate consecutive points
+            assertFalse(
+                distance < Geometry.EPS,
+                "Duplicate consecutive points at indices $i and ${(i + 1) % points.size}"
+            )
+
+            // For stadium, straight edges should be approximately horizontal with length ~2*straightLength
+            // Curved sections should have smaller gaps
+            if (dx > straightLength * 0.9) {
+                // This is a straight edge (horizontal connection between semicircles)
+                assertTrue(
+                    dy < radius * 0.2,
+                    "Straight edge at $i should be mostly horizontal, but dy=$dy is too large"
+                )
+                assertTrue(
+                    distance <= 2 * straightLength + 1.0,
+                    "Straight edge gap too large: $distance"
+                )
+            } else {
+                // This is part of a curved section
+                val expectedMaxCurveGap = (PI * radius) / (points.size / 2) * 1.5 // Allow 1.5x average on curves
+                assertTrue(
+                    distance < expectedMaxCurveGap,
+                    "Curve gap too large between points $i and ${(i + 1) % points.size}: $distance (expected < $expectedMaxCurveGap)"
+                )
+            }
+        }
+    }
 }

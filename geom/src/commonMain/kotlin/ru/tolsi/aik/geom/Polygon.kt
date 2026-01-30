@@ -49,14 +49,32 @@ fun IPolygon.intersection(clipper: Line): List<IPoint> {
         .mapNotNull { it.intersects(clipper) }
 }
 
+/**
+ * Calculate signed area of a polygon using shoelace formula.
+ * Positive value indicates counter-clockwise orientation.
+ * Negative value indicates clockwise orientation.
+ */
+private fun signedArea(points: IPointArrayList): Double {
+    var area = 0.0
+    var j = points.size - 1
+    for (i in points.indices) {
+        area += (points.getX(j) + points.getX(i)) * (points.getY(j) - points.getY(i))
+        j = i
+    }
+    return area / 2.0
+}
+
 // Implements Sutherland–Hodgman algorithm
 fun IPolygon.clip(clipper: IPolygon): IPolygon {
-//    require(this.closed && clipper.closed)
-    // todo what if it is inside of clipper?
-//    if (this.getAllPoints().all { clipper.containsPoint(it.x, it.y) }) {
-//        return this.toPolygon()
-//    }
     val clipperPolygon = clipper.toPolygon()
+
+    assert(signedArea(this.points) > 0) {
+        "Subject polygon must have counter-clockwise orientation (positive signed area)"
+    }
+    assert(signedArea(clipperPolygon.points) > 0) {
+        "Clipper polygon must have counter-clockwise orientation (positive signed area)"
+    }
+
     return clipperPolygon.points.indices.fold(this.toPolygon(), { polygon, i ->
         //i and k are two consecutive indexes
         val k = (i + 1) % clipperPolygon.points.size

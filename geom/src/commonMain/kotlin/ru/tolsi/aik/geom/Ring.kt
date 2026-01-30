@@ -66,8 +66,8 @@ open class Ring(
 
     override val points: IPointArrayList by lazy {
         PointArrayList(totalPoints * 2).apply {
-            // Outer circle (counter-clockwise)
-            for (i in 0 until totalPoints) {
+            // Outer circle (counter-clockwise) - iterate backwards for overall CCW
+            for (i in (totalPoints - 1) downTo 0) {
                 val ratio = i.toDouble() / totalPoints
                 add(
                     _center.x + Angle.cos01(ratio) * outerRadius,
@@ -75,8 +75,8 @@ open class Ring(
                 )
             }
 
-            // Inner circle (clockwise - reversed winding for hole)
-            for (i in totalPoints - 1 downTo 0) {
+            // Inner circle (forward iteration maintains CCW when combined with outer)
+            for (i in 0 until totalPoints) {
                 val ratio = i.toDouble() / totalPoints
                 add(
                     _center.x + Angle.cos01(ratio) * innerRadius,

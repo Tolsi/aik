@@ -44,10 +44,11 @@ open class Trapezoid(
 
     override val points: IPointArrayList
         get() = PointArrayList(4).apply {
+            // Counter-clockwise order
             add(_p0)
-            add(_p1)
-            add(_p2)
             add(_p3)
+            add(_p2)
+            add(_p1)
         }
 
     override val closed: Boolean = true

@@ -236,4 +236,53 @@ class TrapezoidTests {
         assertEquals(0.0, trapezoid.p0.x)
         assertEquals(0.0, trapezoid.p0.y)
     }
+
+    @Test
+    fun testCounterClockwiseOrientation() {
+        val trapezoid = Trapezoid(
+            Point(0.0, 0.0),
+            Point(4.0, 0.0),
+            Point(3.0, 3.0),
+            Point(1.0, 3.0)
+        )
+        val points = trapezoid.points
+
+        var signedArea = 0.0
+        var j = points.size - 1
+        for (i in points.indices) {
+            signedArea += (points.getX(j) + points.getX(i)) * (points.getY(j) - points.getY(i))
+            j = i
+        }
+        signedArea /= 2.0
+
+        assertTrue(
+            signedArea > 0,
+            "Trapezoid must have counter-clockwise orientation (positive signed area), got $signedArea"
+        )
+    }
+
+    @Test
+    fun testClosureAndContinuity() {
+        val trapezoid = Trapezoid(
+            Point(0.0, 0.0),
+            Point(4.0, 0.0),
+            Point(3.0, 3.0),
+            Point(1.0, 3.0)
+        )
+        val points = trapezoid.points
+
+        assertTrue(points.size == 4, "Trapezoid should have 4 points")
+        assertTrue(trapezoid.closed, "Trapezoid should be marked as closed")
+
+        for (i in 0 until points.size) {
+            val p1 = Point(points.getX(i), points.getY(i))
+            val p2 = Point(points.getX((i + 1) % points.size), points.getY((i + 1) % points.size))
+            val distance = p1.distanceTo(p2)
+
+            assertTrue(
+                distance > Geometry.EPS,
+                "Consecutive points should not be duplicates at indices $i and ${(i + 1) % points.size}"
+            )
+        }
+    }
 }

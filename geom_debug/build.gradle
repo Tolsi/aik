@@ -19,6 +19,11 @@ buildscript {
 }
 
 apply plugin: 'kotlin'
+apply plugin: 'application'
+
+application {
+    mainClass = 'ru.tolsi.aik.geom.draw.SwingApp'
+}
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     compilerOptions {

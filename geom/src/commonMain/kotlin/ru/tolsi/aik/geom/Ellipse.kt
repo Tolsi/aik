@@ -76,7 +76,8 @@ open class Ellipse(
             val cosR = cos(rotation.radians)
             val sinR = sin(rotation.radians)
 
-            for (i in 0 until totalPoints) {
+            // Counter-clockwise orientation: iterate backwards
+            for (i in (totalPoints - 1) downTo 0) {
                 val t = 2 * PI * i / totalPoints
                 val cosT = cos(t)
                 val sinT = sin(t)

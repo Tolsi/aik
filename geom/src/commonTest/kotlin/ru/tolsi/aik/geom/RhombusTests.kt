@@ -220,4 +220,43 @@ class RhombusTests {
         assertTrue(almostEquals(8.0, rhombus.diagonal1))
         assertTrue(almostEquals(6.0, rhombus.diagonal2))
     }
+
+    @Test
+    fun testCounterClockwiseOrientation() {
+        val rhombus = Rhombus.fromDiagonals(Point(0.0, 0.0), 8.0, 6.0)
+        val points = rhombus.points
+
+        var signedArea = 0.0
+        var j = points.size - 1
+        for (i in points.indices) {
+            signedArea += (points.getX(j) + points.getX(i)) * (points.getY(j) - points.getY(i))
+            j = i
+        }
+        signedArea /= 2.0
+
+        assertTrue(
+            signedArea > 0,
+            "Rhombus must have counter-clockwise orientation (positive signed area), got $signedArea"
+        )
+    }
+
+    @Test
+    fun testClosureAndContinuity() {
+        val rhombus = Rhombus.fromDiagonals(Point(0.0, 0.0), 8.0, 6.0)
+        val points = rhombus.points
+
+        assertTrue(points.size == 4, "Rhombus should have 4 points")
+        assertTrue(rhombus.closed, "Rhombus should be marked as closed")
+
+        for (i in 0 until points.size) {
+            val p1 = Point(points.getX(i), points.getY(i))
+            val p2 = Point(points.getX((i + 1) % points.size), points.getY((i + 1) % points.size))
+            val distance = p1.distanceTo(p2)
+
+            assertTrue(
+                distance > Geometry.EPS,
+                "Consecutive points should not be duplicates at indices $i and ${(i + 1) % points.size}"
+            )
+        }
+    }
 }

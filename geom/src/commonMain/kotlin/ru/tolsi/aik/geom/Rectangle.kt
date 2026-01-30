@@ -116,8 +116,8 @@ open class Rectangle(
     fun toStringBounds(): String =
         "Rectangle([${left.niceStr},${top.niceStr}]-[${right.niceStr},${bottom.niceStr}])"
 
-    override val points =
-        PointArrayList(4) { add(x, y).add(x, y + height).add(x + width, y + height).add(x + width, y) }
+    override val points: IPointArrayList
+        get() = PointArrayList(4) { add(x, y).add(x, y + height).add(x + width, y + height).add(x + width, y) }
     override val closed: Boolean = true
     override fun containsPoint(x: Double, y: Double) = (x in this.left..this.right) && (y in this.top..this.bottom)
 
